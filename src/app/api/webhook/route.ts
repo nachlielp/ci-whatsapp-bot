@@ -3,11 +3,46 @@ import { supabase } from "../../Supabase";
 import { tryCatch } from "@/util/tryCatch";
 
 export async function POST(request: Request) {
-  const body = await tryCatch(request.json());
-  const result = await tryCatch(supabase.test({ body: body.data }));
-  if (result.error) {
-    // TODO: handle error sentry
-    return NextResponse.json({ status: "error" });
+  try {
+    // Parse the request body
+    const formData = await request.formData();
+
+    // Convert FormData to a regular object
+    const messageData: Record<string, string> = {};
+    formData.forEach((value, key) => {
+      messageData[key] = value.toString();
+    });
+
+    // Log the received data for debugging
+    console.log("Received Twilio webhook data:", messageData);
+
+    // Store the message data in the database
+    const result = await tryCatch(
+      supabase.test({
+        rawBody: messageData,
+        messageSid: messageData.MessageSid,
+        from: messageData.From,
+        to: messageData.To,
+        body: messageData.Body,
+        mediaUrl: messageData.MediaUrl0,
+        timestamp: new Date().toISOString(),
+      })
+    );
+
+    if (result.error) {
+      console.error("Error storing webhook data:", result.error);
+      return NextResponse.json({
+        status: "error",
+        message: "Failed to process webhook",
+      });
+    }
+
+    return NextResponse.json({ status: "success" });
+  } catch (error) {
+    console.error("Error processing webhook:", error);
+    return NextResponse.json({
+      status: "error",
+      message: "Internal server error",
+    });
   }
-  return NextResponse.json({ status: "success" });
 }
