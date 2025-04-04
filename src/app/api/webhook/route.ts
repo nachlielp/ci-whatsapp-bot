@@ -18,14 +18,12 @@ export async function POST(request: Request) {
 
     // Store the message data in the database
     const result = await tryCatch(
-      supabase.test({
-        rawBody: messageData,
-        messageSid: messageData.MessageSid,
-        from: messageData.From,
-        to: messageData.To,
-        body: messageData.Body,
-        mediaUrl: messageData.MediaUrl0,
-        timestamp: new Date().toISOString(),
+      supabase.receiveMessage({
+        blob: messageData,
+        WaId: messageData.MessageSid,
+        ProfileName: messageData.From,
+        Body: messageData.To,
+        MessageType: messageData.Body,
       })
     );
 

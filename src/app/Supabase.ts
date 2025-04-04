@@ -11,8 +11,13 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ACCOUNT_KEY;
 
 // Define the structure of your wa-messages table
+
 interface WAMessage {
   blob: Record<string, unknown>;
+  WaId: string;
+  ProfileName: string;
+  Body: string;
+  MessageType: string;
 }
 
 class Supabase {
@@ -25,13 +30,23 @@ class Supabase {
     this.supabase = createClient(supabaseUrl, supabaseServiceKey);
   }
 
-  async test(blob: Record<string, unknown>): Promise<WAMessage> {
+  async receiveMessage({
+    blob,
+    WaId,
+    ProfileName,
+    Body,
+    MessageType,
+  }: WAMessage): Promise<WAMessage> {
     const result = await tryCatch(
       Promise.resolve(
         this.supabase
           .from("wa-messages")
           .insert({
             blob: blob,
+            WaId: WaId,
+            ProfileName: ProfileName,
+            Body: Body,
+            MessageType: MessageType,
           })
           .select("*")
           .single()
