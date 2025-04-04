@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabase } from "../../Supabase";
 import { tryCatch } from "@/util/tryCatch";
+import { twilio } from "@/app/Twilio";
 // import { twilio } from "@/app/Twilio";
 
 export async function POST(request: Request) {
@@ -34,6 +35,13 @@ export async function POST(request: Request) {
         user_id: user.id,
       })
     );
+
+    const res = await twilio.sendMultipleSelectQuestion(
+      messageData.WaId,
+      messageData.Body,
+      ["Option 1", "Option 2", "Option 3"]
+    );
+    console.log("route_3_res", res);
 
     // const res = await twilio.sendWhatsAppMessage({
     //   to: messageData.To,

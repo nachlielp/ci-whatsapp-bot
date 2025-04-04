@@ -66,6 +66,49 @@ class Twilio {
 
     return result.data;
   }
+
+  async sendMultipleSelectQuestion(
+    to: string,
+    question: string,
+    options: string[]
+  ): Promise<MessageInstance> {
+    const result = await tryCatch(
+      this.client.messages.create({
+        from: `whatsapp:${this.fromNumber}`,
+        to: `whatsapp:${to}`,
+        body: question,
+        contentSid: "HX5a02fdfaec6faf208839c0e3eb82886b", //select_regions
+        contentVariables: JSON.stringify({
+          header: {
+            type: "text",
+            text: question,
+          },
+          body: {
+            text: "Please select your options:",
+          },
+          action: {
+            buttons: options.map((option, index) => ({
+              type: "reply",
+              reply: {
+                id: `option_${index}`,
+                title: option,
+              },
+            })),
+          },
+        }),
+      })
+    );
+
+    console.log("sendMultipleSelectQuestion.result", result);
+
+    if (result.error) {
+      throw new Error(
+        `Failed to send multiple select question: ${result.error}`
+      );
+    }
+
+    return result.data;
+  }
 }
 
 export const twilio = new Twilio();
