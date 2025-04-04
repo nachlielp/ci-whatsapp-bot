@@ -36,21 +36,18 @@ export async function POST(request: Request) {
       })
     );
 
-    const res = await twilio.sendMultipleSelectQuestion(
-      messageData.WaId,
-      messageData.Body,
-      ["Option 1", "Option 2", "Option 3"]
-    );
-    console.log("route_3_res", res);
+    // const res = await twilio.sendMultipleSelectQuestion(
+    //   messageData.WaId,
+    //   messageData.Body,
+    //   ["Option 1", "Option 2", "Option 3"]
+    // );
 
-    // const res = await twilio.sendWhatsAppMessage({
-    //   to: messageData.To,
-    //   contentSid: messageData.SmsSid,
-    //   contentVariables: {
-    //     "1": "12/1",
-    //     "2": "3pm",
-    //   },
-    // });
+    const res = await twilio.sendWhatsAppMessage({
+      to: messageData.To,
+      contentSid: "HX5a02fdfaec6faf208839c0e3eb82886b",
+    });
+
+    console.log("route_3_res", res);
     if (result.error) {
       console.error("Error storing webhook data:", result.error);
       return NextResponse.json({
