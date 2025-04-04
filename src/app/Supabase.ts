@@ -77,7 +77,7 @@ class Supabase {
         .from("wa-users")
         .insert({
           name,
-          phoneNumber,
+          phone: phoneNumber,
         })
         .select()
         .single();
@@ -96,7 +96,7 @@ class Supabase {
         this.supabase
           .from("wa-users")
           .select("*")
-          .eq("phoneNumber", phoneNumber)
+          .eq("phone", phoneNumber)
           .single()
       )
     );
