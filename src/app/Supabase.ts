@@ -1,4 +1,8 @@
-import { createClient } from "@supabase/supabase-js";
+import {
+  createClient,
+  SupabaseClient,
+  PostgrestSingleResponse,
+} from "@supabase/supabase-js";
 import dotenv from "dotenv";
 import { tryCatch } from "@/util/tryCatch";
 dotenv.config();
@@ -6,8 +10,13 @@ dotenv.config();
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ACCOUNT_KEY;
 
+// Define the structure of your wa-messages table
+interface WAMessage {
+  blob: Record<string, unknown>;
+}
+
 class Supabase {
-  supabase: any;
+  supabase: SupabaseClient;
 
   constructor() {
     if (!supabaseUrl || !supabaseServiceKey) {
@@ -16,18 +25,21 @@ class Supabase {
     this.supabase = createClient(supabaseUrl, supabaseServiceKey);
   }
 
-  async test(blob: any): Promise<any> {
+  async test(blob: Record<string, unknown>): Promise<WAMessage> {
     const result = await tryCatch(
-      this.supabase
-        .from("wa-messages")
-        .insert({
-          blob: blob,
-        })
-        .select("*")
-        .single()
+      Promise.resolve(
+        this.supabase
+          .from("wa-messages")
+          .insert({
+            blob: blob,
+          })
+          .select("*")
+          .single()
+      )
     );
-    console.log("supabase test", result);
-    return result;
+
+    return (result.data as PostgrestSingleResponse<WAMessage>)
+      .data as WAMessage;
   }
 }
 
