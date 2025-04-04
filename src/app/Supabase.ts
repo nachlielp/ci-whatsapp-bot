@@ -18,6 +18,7 @@ interface WAMessage {
   ProfileName: string;
   Body: string;
   MessageType: string;
+  user_id: string;
 }
 
 interface WAUser {
@@ -44,6 +45,7 @@ class Supabase {
     ProfileName,
     Body,
     MessageType,
+    user_id,
   }: WAMessage): Promise<WAMessage> {
     try {
       const result = await this.supabase
@@ -54,6 +56,7 @@ class Supabase {
           ProfileName: ProfileName,
           Body: Body,
           MessageType: MessageType,
+          user_id: user_id,
         })
         .select("*")
         .single();

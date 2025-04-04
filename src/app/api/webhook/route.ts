@@ -31,6 +31,7 @@ export async function POST(request: Request) {
         ProfileName: messageData.ProfileName,
         Body: messageData.Body,
         MessageType: messageData.MessageType,
+        user_id: user.id,
       })
     );
 
