@@ -46,7 +46,7 @@ class Supabase {
     Body,
     MessageType,
     user_id,
-  }: WAMessage): Promise<WAMessage> {
+  }: WAMessage): Promise<WAMessage | null> {
     try {
       const result = await this.supabase
         .from("wa-messages")
@@ -63,8 +63,9 @@ class Supabase {
       console.log("receiveMessage.result", result);
       return result.data as WAMessage;
     } catch (e) {
+      //Sentery
       console.error("Error creating user:", e);
-      throw e;
+      return null;
     }
   }
 

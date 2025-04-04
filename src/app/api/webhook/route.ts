@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { supabase } from "../../Supabase";
-import { tryCatch } from "@/util/tryCatch";
 import { twilio } from "@/app/Twilio";
 // import { twilio } from "@/app/Twilio";
 
@@ -16,45 +15,36 @@ export async function POST(request: Request) {
     });
 
     let user = await supabase.getUserByPhoneNumber(messageData.WaId);
-    console.log("route_1_user", user);
+
     if (!user) {
       user = await supabase.createUser({
         name: messageData.ProfileName,
         phoneNumber: messageData.WaId,
       });
     }
-    console.log("route_2_user", user);
+
     // Store the message data in the database
-    const result = await tryCatch(
-      supabase.receiveMessage({
-        blob: messageData,
-        WaId: messageData.WaId,
-        ProfileName: messageData.ProfileName,
-        Body: messageData.Body,
-        MessageType: messageData.MessageType,
-        user_id: user.id,
-      })
-    );
-
-    // const res = await twilio.sendMultipleSelectQuestion(
-    //   messageData.WaId,
-    //   messageData.Body,
-    //   ["Option 1", "Option 2", "Option 3"]
-    // );
-
-    const res = await twilio.sendWhatsAppMessage({
-      to: messageData.From,
-      contentSid: "HX5a02fdfaec6faf208839c0e3eb82886b",
+    const result = await supabase.receiveMessage({
+      blob: messageData,
+      WaId: messageData.WaId,
+      ProfileName: messageData.ProfileName,
+      Body: messageData.Body,
+      MessageType: messageData.MessageType,
+      user_id: user.id,
     });
 
-    console.log("route_3_res", res);
-    if (result.error) {
-      console.error("Error storing webhook data:", result.error);
+    if (!result) {
       return NextResponse.json({
         status: "error",
         message: "Failed to process webhook",
       });
     }
+
+    //TODO: send message to user
+    await twilio.sendWhatsAppMessage({
+      to: messageData.From,
+      contentSid: process.env.TWILIO_TEMPLATE_SELECT_SETUP_OR_REGION!,
+    });
 
     return NextResponse.json({ status: "success" });
   } catch (error) {
