@@ -1,7 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import dotenv from "dotenv";
-import dayjs from "dayjs";
-
+import { tryCatch } from "@/util/tryCatch";
 dotenv.config();
 
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -17,27 +16,18 @@ class Supabase {
     this.supabase = createClient(supabaseUrl, supabaseServiceKey);
   }
 
-  async test(bolb: any): Promise<boolean> {
-    const env_notification_flag = process.env.ENV_NOTIFICATION_FLAG;
-
-    try {
-      const { data, error } = await this.supabase
+  async test(blob: any): Promise<any> {
+    const result = await tryCatch(
+      this.supabase
         .from("wa-messages")
         .insert({
-          blob: bolb,
+          blob: blob,
         })
-        .select("*");
-
-      if (error) {
-        console.error("Error checking notification flag:", error);
-        return false;
-      }
-      return true;
-    } catch (error) {
-      // TODO: handle error
-      console.error("Error checking notification flag:", error);
-      return false;
-    }
+        .select("*")
+        .single()
+    );
+    console.log("supabase test", result);
+    return result;
   }
 }
 
