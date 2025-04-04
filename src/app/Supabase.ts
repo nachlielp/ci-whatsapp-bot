@@ -20,6 +20,14 @@ interface WAMessage {
   MessageType: string;
 }
 
+interface WAUser {
+  name: string;
+  phone_number: string;
+  created_at: string;
+  id: string;
+  filter: object;
+}
+
 class Supabase {
   supabase: SupabaseClient;
 
@@ -55,6 +63,39 @@ class Supabase {
 
     return (result.data as PostgrestSingleResponse<WAMessage>)
       .data as WAMessage;
+  }
+
+  async createUser({
+    name,
+    phoneNumber,
+  }: {
+    name: string;
+    phoneNumber: string;
+  }) {
+    const result = await tryCatch(
+      Promise.resolve(
+        this.supabase.from("wa-users").insert({
+          name,
+          phoneNumber,
+        })
+      )
+    );
+
+    return result.data as PostgrestSingleResponse<WAUser>;
+  }
+
+  async getUserByPhoneNumber(phoneNumber: string) {
+    const result = await tryCatch(
+      Promise.resolve(
+        this.supabase
+          .from("wa-users")
+          .select("*")
+          .eq("phoneNumber", phoneNumber)
+          .single()
+      )
+    );
+
+    return result.data as PostgrestSingleResponse<WAUser>;
   }
 }
 

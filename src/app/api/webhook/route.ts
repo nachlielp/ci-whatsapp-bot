@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabase } from "../../Supabase";
 import { tryCatch } from "@/util/tryCatch";
+// import { twilio } from "@/app/Twilio";
 
 export async function POST(request: Request) {
   try {
@@ -13,9 +14,14 @@ export async function POST(request: Request) {
       messageData[key] = value.toString();
     });
 
-    // Log the received data for debugging
-    console.log("Received Twilio webhook data:", messageData);
+    let user = await supabase.getUserByPhoneNumber(messageData.WaId);
 
+    if (!user) {
+      user = await supabase.createUser({
+        name: messageData.ProfileName,
+        phoneNumber: messageData.WaId,
+      });
+    }
     // Store the message data in the database
     const result = await tryCatch(
       supabase.receiveMessage({
@@ -27,6 +33,14 @@ export async function POST(request: Request) {
       })
     );
 
+    // const res = await twilio.sendWhatsAppMessage({
+    //   to: messageData.To,
+    //   contentSid: messageData.SmsSid,
+    //   contentVariables: {
+    //     "1": "12/1",
+    //     "2": "3pm",
+    //   },
+    // });
     if (result.error) {
       console.error("Error storing webhook data:", result.error);
       return NextResponse.json({
