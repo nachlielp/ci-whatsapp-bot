@@ -1,7 +1,7 @@
 import {
   createClient,
   SupabaseClient,
-  PostgrestSingleResponse,
+  //   PostgrestSingleResponse,
 } from "@supabase/supabase-js";
 import dotenv from "dotenv";
 import { tryCatch } from "@/util/tryCatch";
@@ -45,24 +45,24 @@ class Supabase {
     Body,
     MessageType,
   }: WAMessage): Promise<WAMessage> {
-    const result = await tryCatch(
-      Promise.resolve(
-        this.supabase
-          .from("wa-messages")
-          .insert({
-            blob: blob,
-            WaId: WaId,
-            ProfileName: ProfileName,
-            Body: Body,
-            MessageType: MessageType,
-          })
-          .select("*")
-          .single()
-      )
-    );
-
-    return (result.data as PostgrestSingleResponse<WAMessage>)
-      .data as WAMessage;
+    try {
+      const result = await this.supabase
+        .from("wa-messages")
+        .insert({
+          blob: blob,
+          WaId: WaId,
+          ProfileName: ProfileName,
+          Body: Body,
+          MessageType: MessageType,
+        })
+        .select("*")
+        .single();
+      console.log("receiveMessage.result", result);
+      return result.data as WAMessage;
+    } catch (e) {
+      console.error("Error creating user:", e);
+      throw e;
+    }
   }
 
   async createUser({
@@ -71,17 +71,23 @@ class Supabase {
   }: {
     name: string;
     phoneNumber: string;
-  }) {
-    const result = await tryCatch(
-      Promise.resolve(
-        this.supabase.from("wa-users").insert({
+  }): Promise<WAUser> {
+    try {
+      const result = await this.supabase
+        .from("wa-users")
+        .insert({
           name,
           phoneNumber,
         })
-      )
-    );
+        .select()
+        .single();
 
-    return result.data as PostgrestSingleResponse<WAUser>;
+      console.log("createUser.result", result);
+      return result.data as WAUser;
+    } catch (error) {
+      console.error("Error creating user:", error);
+      throw error;
+    }
   }
 
   async getUserByPhoneNumber(phoneNumber: string) {
@@ -95,7 +101,9 @@ class Supabase {
       )
     );
 
-    return result.data as PostgrestSingleResponse<WAUser>;
+    console.log("_1_result", result);
+
+    return result.data?.data as WAUser;
   }
 }
 

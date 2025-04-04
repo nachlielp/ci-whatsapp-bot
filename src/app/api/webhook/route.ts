@@ -15,14 +15,14 @@ export async function POST(request: Request) {
     });
 
     let user = await supabase.getUserByPhoneNumber(messageData.WaId);
-    console.log("_1_user", user);
+    console.log("route_1_user", user);
     if (!user) {
       user = await supabase.createUser({
         name: messageData.ProfileName,
         phoneNumber: messageData.WaId,
       });
     }
-    console.log("_2_user", user);
+    console.log("route_2_user", user);
     // Store the message data in the database
     const result = await tryCatch(
       supabase.receiveMessage({
