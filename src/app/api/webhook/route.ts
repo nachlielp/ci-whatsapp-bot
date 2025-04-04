@@ -20,10 +20,10 @@ export async function POST(request: Request) {
     const result = await tryCatch(
       supabase.receiveMessage({
         blob: messageData,
-        WaId: messageData.MessageSid,
-        ProfileName: messageData.From,
-        Body: messageData.To,
-        MessageType: messageData.Body,
+        WaId: messageData.WaId,
+        ProfileName: messageData.ProfileName,
+        Body: messageData.Body,
+        MessageType: messageData.MessageType,
       })
     );
 
