@@ -43,7 +43,7 @@ export async function POST(request: Request) {
     // );
 
     const res = await twilio.sendWhatsAppMessage({
-      to: messageData.To,
+      to: messageData.From,
       contentSid: "HX5a02fdfaec6faf208839c0e3eb82886b",
     });
 
