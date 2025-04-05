@@ -6,6 +6,7 @@ import {
   filterCIEventsByType,
   formatCIEventsList,
   emptyRegionMessage,
+  setupWeeklyMessage,
 } from "@/util/utilService";
 // import { twilio } from "@/app/Twilio";
 
@@ -67,6 +68,7 @@ export async function POST(request: Request) {
     } else if (messageData.MessageType === "interactive") {
       switch (messageData.ButtonPayload) {
         case "first_message_reminder":
+          await twilio.sendText(messageData.From, setupWeeklyMessage());
           break;
         case "first_message_events":
           await twilio.sendTemplate(
