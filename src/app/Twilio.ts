@@ -75,8 +75,8 @@ class Twilio {
         from: `whatsapp:${this.fromNumber}`,
         to: `whatsapp:${to}`,
         body: events
-          .map((event) => `${event.title} - ${event.start_date}`)
-          .join("\n"),
+          .map((event) => `*${event.title}* - ${event.start_date}`)
+          .join("\n\n"),
       })
     );
 
