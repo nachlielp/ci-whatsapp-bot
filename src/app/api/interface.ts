@@ -84,3 +84,8 @@ export interface SelectOption {
   value: string;
   label: string;
 }
+
+export enum EventListType {
+  james = "james",
+  courses = "courses",
+}

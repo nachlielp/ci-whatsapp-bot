@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import { twilio } from "@/app/Twilio";
-import { filterCIEventsByType } from "@/util/utilService";
-import { formatCIEventsList } from "@/util/utilService";
-import { EventlyType } from "../interface";
+import { filterCIEventsByType, formatCIEventsList } from "@/util/utilService";
+import { EventlyType, Region } from "../interface";
 import { supabase } from "@/app/Supabase";
 export async function GET() {
   console.log("test");
@@ -18,7 +17,11 @@ export async function GET() {
     EventlyType.retreat,
     EventlyType.workshop,
   ]);
-  const formattedEvents = formatCIEventsList(filteredEvents);
+  const formattedEvents = formatCIEventsList(
+    filteredEvents,
+    "courses",
+    Region.center
+  );
   const res = await twilio.sendText("whatsapp:+972584994306", formattedEvents);
   //   const res = await twilio.sendWhatsAppText("+972584994306", "hellow world");
   return NextResponse.json(res);
