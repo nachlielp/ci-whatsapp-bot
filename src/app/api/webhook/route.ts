@@ -6,7 +6,6 @@ import {
   filterCIEventsByType,
   formatCIEventsList,
   emptyRegionMessage,
-  getWeeklyFilterFromBody,
   setupWeeklyMessage,
   formatSubscribedRegions,
 } from "@/util/utilService";
