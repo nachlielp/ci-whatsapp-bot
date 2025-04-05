@@ -68,11 +68,19 @@ class Twilio {
   }
 
   async sendFirstQuestion(to: string): Promise<MessageInstance> {
+    const contentSid = process.env.TWILIO_TEMPLATE_SELECT_SETUP_OR_REGION!;
+
+    console.log("contentSid", contentSid);
+
+    if (!contentSid) {
+      throw new Error("Twilio template is not set");
+    }
+
     const result = await tryCatch(
       this.client.messages.create({
         from: `whatsapp:${this.fromNumber}`,
         to: `whatsapp:${to}`,
-        contentSid: process.env.TWILIO_TEMPLATE_SELECT_SETUP_OR_REGION!,
+        contentSid,
         contentVariables: JSON.stringify({}), // Add empty content variables if your template doesn't require any
       })
     );
