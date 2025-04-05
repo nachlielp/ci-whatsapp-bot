@@ -44,8 +44,12 @@ export async function POST(request: Request) {
 
     if (messageData.MessageType === "text") {
       if (messageData.Body.includes("הסר")) {
-        //TODO: remove user from database
+        console.log(`_debug_1_from: ${messageData.From} contins "הסר"`);
+        //TODO: remove reminder for user
       } else {
+        console.log(
+          `_debug_2_from: ${messageData.From} , sid: ${process.env.TWILIO_TEMPLATE_FIRST_MESSAGE}`
+        );
         await twilio.sendTemplate(
           messageData.From,
           process.env.TWILIO_TEMPLATE_FIRST_MESSAGE!

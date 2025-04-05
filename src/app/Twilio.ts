@@ -80,7 +80,7 @@ class Twilio {
       })
     );
 
-    console.log("sendFirstQuestion.result", result);
+    console.log("sendTemplate.result", result);
 
     if (result.error) {
       throw new Error(`Failed to send first question: ${result.error}`);
