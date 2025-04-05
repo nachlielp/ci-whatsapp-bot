@@ -73,7 +73,7 @@ class Twilio {
     const result = await tryCatch(
       this.client.messages.create({
         from: `whatsapp:${this.fromNumber}`,
-        to: `whatsapp:${to}`,
+        to: `${to}`,
         body: events
           .map((event) => `*${event.title}* - ${event.start_date}`)
           .join("\n\n"),
