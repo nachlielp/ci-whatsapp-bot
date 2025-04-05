@@ -6,7 +6,9 @@ import {
   filterCIEventsByType,
   formatCIEventsList,
   emptyRegionMessage,
+  getWeeklyFilterFromBody,
   setupWeeklyMessage,
+  formatSubscribedRegions,
 } from "@/util/utilService";
 // import { twilio } from "@/app/Twilio";
 
@@ -59,6 +61,12 @@ export async function POST(request: Request) {
             `*ישנה תקלה בהסרה, אנא צרו איתנו קשר במייל* info@ci-events.org`
           );
         }
+      } else if (messageData.Body.includes("שבועי")) {
+        const regions = await supabase.setWeeklyFilter(user, messageData.Body);
+        await twilio.sendText(
+          `whatsapp:${user.phone}`,
+          formatSubscribedRegions(regions)
+        );
       } else {
         await twilio.sendTemplate(
           messageData.From,
