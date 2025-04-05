@@ -66,6 +66,21 @@ class Twilio {
 
     return result.data;
   }
+  async sendWeeksCIEvents(to: string, events: any[]): Promise<MessageInstance> {
+    const result = await tryCatch(
+      this.client.messages.create({
+        from: `whatsapp:${this.fromNumber}`,
+        to: `whatsapp:${to}`,
+        body: events.map((event) => event.title).join("\n"),
+      })
+    );
+
+    if (result.error) {
+      throw new Error(`Failed to send WhatsApp text: ${result.error}`);
+    }
+
+    return result.data;
+  }
 
   async sendFirstQuestion(to: string): Promise<MessageInstance> {
     const contentSid = process.env.TWILIO_TEMPLATE_SELECT_SETUP_OR_REGION!;

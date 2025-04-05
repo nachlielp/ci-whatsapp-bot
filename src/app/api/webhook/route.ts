@@ -61,6 +61,36 @@ export async function POST(request: Request) {
         default:
         // await twilio.sendFirstQuestion(messageData.From);
       }
+
+      let region;
+      switch (messageData.ListId) {
+        case "select_regions_jerusalem":
+          region = "jerusalem";
+          break;
+        case "select_regions_center":
+          region = "center";
+          break;
+        case "select_regions_south":
+          region = "south";
+          break;
+        case "select_regions_pardes_hanna":
+          region = "pardesHanna";
+          break;
+        case "select_regions_carmel":
+          region = "carmel";
+          break;
+        case "select_regions_haifa":
+          region = "haifa";
+          break;
+        case "select_regions_galilee":
+          region = "galilee";
+          break;
+      }
+
+      if (region) {
+        const ci_events = await supabase.getCIEventsByRegion(region);
+        await twilio.sendWeeksCIEvents(messageData.From, ci_events);
+      }
     }
 
     return NextResponse.json({ status: "success" });

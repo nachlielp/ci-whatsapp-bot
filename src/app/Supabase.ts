@@ -5,6 +5,7 @@ import {
 } from "@supabase/supabase-js";
 import dotenv from "dotenv";
 import { tryCatch } from "@/util/tryCatch";
+import dayjs from "dayjs";
 dotenv.config();
 
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -108,6 +109,28 @@ class Supabase {
     console.log("_1_result", result);
 
     return result.data?.data as WAUser;
+  }
+
+  async getCIEventsByRegion(
+    region: string,
+    formDate: string = dayjs().format("YYYY-MM-DD"),
+    toDate: string = dayjs().add(7, "day").format("YYYY-MM-DD")
+  ) {
+    console.log("getCIEventsByRegion", region, formDate, toDate);
+    try {
+      const result = await this.supabase
+        .from("ci_events")
+        .select("*")
+        .eq("district", region)
+        .gte("start_date", formDate)
+        .lte("start_date", toDate);
+
+      console.log("getCIEventsByRegion.result", result);
+      return result.data as any[];
+    } catch (e) {
+      console.error("Error getting CI events by region:", e);
+      return [];
+    }
   }
 }
 
