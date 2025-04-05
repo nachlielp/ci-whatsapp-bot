@@ -61,12 +61,6 @@ export async function POST(request: Request) {
       }
     } else if (messageData.MessageType === "interactive") {
       switch (messageData.ButtonPayload) {
-        case "event_types_james":
-          await twilio.sendTemplate(
-            messageData.From,
-            process.env.TWILIO_TEMPLATE_SELECT_REGION!
-          );
-          break;
         case "first_message_reminder":
           break;
         case "first_message_events":
@@ -75,7 +69,13 @@ export async function POST(request: Request) {
             process.env.TWILIO_TEMPLATE_SELECT_EVENT_TYPES!
           );
           break;
-        case "first_message_courses":
+        case "event_types_james":
+          await twilio.sendTemplate(
+            messageData.From,
+            process.env.TWILIO_TEMPLATE_SELECT_REGION!
+          );
+          break;
+        case "event_types_courses":
           const ci_events = await supabase.getCIEvents();
           console.log("ci_events", ci_events);
           const filteredEvents = filterCIEventsByType(ci_events, [
