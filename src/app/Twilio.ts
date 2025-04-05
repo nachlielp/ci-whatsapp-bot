@@ -93,6 +93,28 @@ class Twilio {
 
     return result.data;
   }
+  async sendTemplate(to: string, contentSid: string): Promise<MessageInstance> {
+    if (!contentSid) {
+      throw new Error("sendTemplate.Twilio template is not set");
+    }
+
+    const result = await tryCatch(
+      this.client.messages.create({
+        from: `whatsapp:${this.fromNumber}`,
+        to: `${to}`,
+        contentSid,
+        contentVariables: JSON.stringify({}), // Add empty content variables if your template doesn't require any
+      })
+    );
+
+    console.log("sendFirstQuestion.result", result);
+
+    if (result.error) {
+      throw new Error(`Failed to send first question: ${result.error}`);
+    }
+
+    return result.data;
+  }
 }
 
 export const twilio = new Twilio();

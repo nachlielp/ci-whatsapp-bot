@@ -40,8 +40,28 @@ export async function POST(request: Request) {
       });
     }
 
-    //TODO: send message to user
-    await twilio.sendFirstQuestion(messageData.From);
+    if (messageData.MessageType === "text") {
+      if (messageData.Body.includes("הסר")) {
+        //TODO: remove user from database
+      } else {
+        await twilio.sendTemplate(
+          messageData.From,
+          process.env.TWILIO_TEMPLATE_SELECT_SETUP_OR_REGION!
+        );
+      }
+    } else if (messageData.MessageType === "interactive") {
+      switch (messageData.ButtonPayload) {
+        case "first_message_events":
+          await twilio.sendTemplate(
+            messageData.From,
+            process.env.TWILIO_TEMPLATE_SELECT_REGION!
+          );
+          break;
+
+        default:
+        // await twilio.sendFirstQuestion(messageData.From);
+      }
+    }
 
     return NextResponse.json({ status: "success" });
   } catch (error) {
