@@ -89,3 +89,19 @@ export enum EventListType {
   james = "james",
   courses = "courses",
 }
+export interface WAMessage {
+  blob: Record<string, unknown>;
+  WaId: string;
+  ProfileName: string;
+  Body: string;
+  MessageType: string;
+  user_id: string;
+}
+
+export interface WAUser {
+  name: string;
+  phone: string;
+  created_at: string;
+  id: string;
+  filter: Region[];
+}

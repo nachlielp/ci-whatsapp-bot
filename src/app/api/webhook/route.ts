@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabase } from "../../Supabase";
 import { twilio } from "@/app/Twilio";
-import { EventlyType, Region, EventListType } from "../interface";
+import { EventlyType, Region, districtOptions } from "../interface";
 import {
   filterCIEventsByType,
   formatCIEventsList,
@@ -97,13 +97,25 @@ export async function POST(request: Request) {
             EventlyType.retreat,
             EventlyType.workshop,
           ]);
-          const formattedEvents = formatCIEventsList(
-            filteredEvents,
-            EventListType.courses
-          );
-          await twilio.sendText(messageData.From, formattedEvents);
-          break;
+          const formattedCourseEvents = formatCIEventsList(filteredEvents);
 
+          const coursesTitle = `*קורסים וסדנאות וריטריטים בחודשיים הקרובים*`;
+          await twilio.sendText(
+            messageData.From,
+            coursesTitle + "\n\n" + formattedCourseEvents
+          );
+          break;
+        case "weekly_schedule_events":
+          const weeklyScheduleTitle = `*אירועים בשבוע הקרוב ב${user.filter
+            .map((r) => districtOptions.find((d) => d.value === r)?.label)
+            .join(", ")}*`;
+          const events = await supabase.getCIEventsByRegions(user.filter);
+          const formattedWeeklyScheduleEvents = formatCIEventsList(events);
+          await twilio.sendText(
+            messageData.From,
+            weeklyScheduleTitle + "\n\n" + formattedWeeklyScheduleEvents
+          );
+          break;
         default:
       }
 
@@ -140,13 +152,16 @@ export async function POST(request: Request) {
           EventlyType.underscore,
           EventlyType.score,
         ]);
-        const formattedEvents = formatCIEventsList(
-          filteredEvents,
-          EventListType.james,
-          region as Region
-        );
+        const formattedEvents = formatCIEventsList(filteredEvents);
         if (formattedEvents) {
-          await twilio.sendText(messageData.From, formattedEvents);
+          const regionHebrew = districtOptions.find(
+            (r) => r.value === region
+          )?.label;
+          const jamesTitle = `*ג׳אמים ושיעורים ב${regionHebrew} בשבוע הקרוב*`;
+          await twilio.sendText(
+            messageData.From,
+            jamesTitle + "\n\n" + formattedEvents
+          );
         } else {
           await twilio.sendText(
             messageData.From,

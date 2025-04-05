@@ -6,7 +6,7 @@ import {
 import dotenv from "dotenv";
 import { tryCatch } from "@/util/tryCatch";
 import dayjs from "dayjs";
-import { CIEventList } from "./api/interface";
+import { CIEventList, WAMessage, WAUser, Region } from "./api/interface";
 import { getWeeklyFilterFromBody } from "@/util/utilService";
 dotenv.config();
 
@@ -14,23 +14,6 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ACCOUNT_KEY;
 
 // Define the structure of your wa-messages table
-
-interface WAMessage {
-  blob: Record<string, unknown>;
-  WaId: string;
-  ProfileName: string;
-  Body: string;
-  MessageType: string;
-  user_id: string;
-}
-
-interface WAUser {
-  name: string;
-  phone: string;
-  created_at: string;
-  id: string;
-  filter: object;
-}
 
 class Supabase {
   supabase: SupabaseClient;
@@ -125,6 +108,31 @@ class Supabase {
           "id, short_id, title,  address, start_date, end_date,segments, type,is_multi_day"
         )
         .eq("district", region)
+        .gte("start_date", formDate)
+        .lte("start_date", toDate)
+        .not("hide", "is", true)
+        .not("cancelled", "is", true);
+
+      const list: CIEventList[] = result.data ?? [];
+
+      return list;
+    } catch (e) {
+      console.error("Error getting CI events by region:", e);
+      return [];
+    }
+  }
+  async getCIEventsByRegions(
+    regions: Region[],
+    formDate: string = dayjs().format("YYYY-MM-DD"),
+    toDate: string = dayjs().add(7, "day").format("YYYY-MM-DD")
+  ) {
+    try {
+      const result = await this.supabase
+        .from("ci_events")
+        .select(
+          "id, short_id, title,  address, start_date, end_date,segments, type,is_multi_day"
+        )
+        .in("district", regions)
         .gte("start_date", formDate)
         .lte("start_date", toDate)
         .not("hide", "is", true)

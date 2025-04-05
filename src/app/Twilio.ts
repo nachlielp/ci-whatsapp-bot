@@ -66,7 +66,11 @@ class Twilio {
     return result.data;
   }
 
-  async sendTemplate(to: string, contentSid: string): Promise<MessageInstance> {
+  async sendTemplate(
+    to: string,
+    contentSid: string,
+    contentVariables: Record<string, string> = {}
+  ): Promise<MessageInstance> {
     if (!contentSid) {
       throw new Error("sendTemplate.Twilio template is not set");
     }
@@ -76,7 +80,7 @@ class Twilio {
         from: `whatsapp:${this.fromNumber}`,
         to: `${to}`,
         contentSid,
-        contentVariables: JSON.stringify({}), // Add empty content variables if your template doesn't require any
+        contentVariables: JSON.stringify(contentVariables),
       })
     );
 

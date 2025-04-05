@@ -3,7 +3,6 @@ import {
   districtOptions,
   EventlyType,
   Region,
-  EventListType,
 } from "@/app/api/interface";
 import dayjs from "dayjs";
 import "dayjs/locale/he";
@@ -62,31 +61,16 @@ export function filterCIEventsByType(
   );
 }
 
-export function formatCIEventsList(
-  events: CIEventList[],
-  eventListType: EventListType,
-  region?: Region
-) {
-  const regionHebrew = districtOptions.find((r) => r.value === region)?.label;
-  const jamesTitle = `*ג׳אמים ושיעורים ב${regionHebrew} בשבוע הקרוב*`;
-  const coursesTitle = `*קורסים וסדנאות בחודשיים הקרובים*`;
-
-  const title =
-    eventListType === EventListType.james ? jamesTitle : coursesTitle;
-
-  return (
-    title +
-    "\n\n" +
-    events
-      .sort((a, b) => dayjs(a.start_date).diff(dayjs(b.start_date)))
-      .map(
-        (event) =>
-          `*${event.title}* \n יום ${hebrewDate(event.start_date)} ${formatTime(
-            event
-          )} ${event.address.label} \n  ${formatEventUrl(event)}`
-      )
-      .join("\n\n")
-  );
+export function formatCIEventsList(events: CIEventList[]) {
+  return events
+    .sort((a, b) => dayjs(a.start_date).diff(dayjs(b.start_date)))
+    .map(
+      (event) =>
+        `*${event.title}* \n יום ${hebrewDate(event.start_date)} ${formatTime(
+          event
+        )} ${event.address.label} \n  ${formatEventUrl(event)}`
+    )
+    .join("\n\n");
 }
 
 function hebrewDate(date: string) {
@@ -160,5 +144,7 @@ export function formatSubscribedRegions(regions: Region[]) {
   const regionHebrew = regions
     .map((region) => districtOptions.find((r) => r.value === region)?.label)
     .join(", ");
-  return `*נרשמתם בהצלחה לקבל עדכון שבועי על אירועים באיזורים הבאים: ${regionHebrew}*`;
+  return `*נרשמתם בהצלחה לקבל עדכון שבועי על אירועים באיזורים הבאים: ${regionHebrew}*
+
+להסרה שילחו הודעה עם המילה *הסר*`;
 }
