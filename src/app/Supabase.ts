@@ -117,26 +117,43 @@ class Supabase {
     formDate: string = dayjs().format("YYYY-MM-DD"),
     toDate: string = dayjs().add(7, "day").format("YYYY-MM-DD")
   ) {
-    console.log("getCIEventsByRegion", region, formDate, toDate);
     try {
       const result = await this.supabase
         .from("ci_events")
-        .select("id, short_id, title,  address, start_date, end_date")
+        .select(
+          "id, short_id, title,  address, start_date, end_date,segments, type,is_multi_day"
+        )
         .eq("district", region)
         .gte("start_date", formDate)
         .lte("start_date", toDate)
         .not("hide", "is", true)
         .not("cancelled", "is", true);
 
-      const list: CIEventList[] =
-        result.data
-          ?.sort((a, b) => dayjs(a.start_date).diff(dayjs(b.start_date)))
-          .map((event) => ({
-            title: event.title,
-            start_date: event.start_date,
-          })) ?? [];
+      const list: CIEventList[] = result.data ?? [];
 
-      console.log("getCIEventsByRegion.result", result);
+      return list;
+    } catch (e) {
+      console.error("Error getting CI events by region:", e);
+      return [];
+    }
+  }
+  async getCIEvents(
+    formDate: string = dayjs().format("YYYY-MM-DD"),
+    toDate: string = dayjs().add(60, "day").format("YYYY-MM-DD")
+  ) {
+    try {
+      const result = await this.supabase
+        .from("ci_events")
+        .select(
+          "id, short_id, title,  address, start_date, end_date,segments, type,is_multi_day"
+        )
+        .gte("start_date", formDate)
+        .lte("start_date", toDate)
+        .not("hide", "is", true)
+        .not("cancelled", "is", true);
+
+      const list: CIEventList[] = result.data ?? [];
+
       return list;
     } catch (e) {
       console.error("Error getting CI events by region:", e);

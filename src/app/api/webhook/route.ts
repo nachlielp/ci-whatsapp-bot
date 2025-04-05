@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { supabase } from "../../Supabase";
 import { twilio } from "@/app/Twilio";
+import { EventlyType } from "../interface";
+import { filterCIEventsByType, formatCIEventsList } from "@/util/utilService";
 // import { twilio } from "@/app/Twilio";
 
 export async function POST(request: Request) {
@@ -50,6 +52,7 @@ export async function POST(request: Request) {
         );
       }
     } else if (messageData.MessageType === "interactive") {
+      let type;
       switch (messageData.ButtonPayload) {
         case "first_message_events":
           await twilio.sendTemplate(
@@ -57,7 +60,14 @@ export async function POST(request: Request) {
             process.env.TWILIO_TEMPLATE_SELECT_REGION!
           );
           break;
-
+        case "first_message_reminder":
+          break;
+        case "first_message_courses":
+          type = EventlyType.course;
+          break;
+        case "first_message_workshops":
+          type = EventlyType.workshop;
+          break;
         default:
         // await twilio.sendFirstQuestion(messageData.From);
       }
@@ -89,7 +99,23 @@ export async function POST(request: Request) {
 
       if (region) {
         const ci_events = await supabase.getCIEventsByRegion(region);
-        await twilio.sendWeeksCIEvents(messageData.From, ci_events);
+        const filteredEvents = filterCIEventsByType(ci_events, [
+          EventlyType.class,
+          EventlyType.jame,
+          EventlyType.underscore,
+          EventlyType.score,
+        ]);
+        const formattedEvents = formatCIEventsList(filteredEvents);
+        await twilio.sendText(messageData.From, formattedEvents);
+      } else if (type) {
+        const ci_events = await supabase.getCIEvents();
+        const types =
+          type === EventlyType.course
+            ? [EventlyType.course]
+            : [EventlyType.retreat, EventlyType.workshop];
+        const filteredEvents = filterCIEventsByType(ci_events, types);
+        const formattedEvents = formatCIEventsList(filteredEvents);
+        await twilio.sendText(messageData.From, formattedEvents);
       }
     }
 

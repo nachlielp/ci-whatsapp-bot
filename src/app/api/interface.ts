@@ -8,11 +8,11 @@ export interface CIEvent {
   start_date: string;
   end_date: string;
   district: string;
-  type: string;
   segments: CIEventSegments[];
   is_multi_day: boolean;
   cancelled: boolean;
   cancelled_text: string;
+  type: EventlyType;
 }
 export interface IAddress {
   place_id: string;
@@ -33,4 +33,44 @@ export interface UserOption {
 export interface CIEventList {
   title: string;
   start_date: string;
+  short_id: string;
+  segments: CIEventSegments[];
+  address: IAddress;
+  type: EventlyType;
+  is_multi_day: boolean;
+}
+export enum EventlyType {
+  class = "class",
+  jame = "jame",
+  workshop = "workshop",
+  conference = "conference",
+  underscore = "underscore",
+  retreat = "retreat",
+  course = "course",
+  score = "score",
+}
+
+export const districtOptions: SelectOption[] = [
+  { value: "center", label: "מרכז" },
+  { value: "jerusalem", label: "ירושלים" },
+  { value: "galilee", label: "גליל" },
+  { value: "haifa", label: "חיפה" },
+  { value: "carmel", label: "חוף כרמל" },
+  { value: "pardesHanna", label: "פרדס חנה" },
+  { value: "south", label: "דרום" },
+];
+export const eventOptions: SelectOption[] = [
+  { value: "class", label: "שיעור" },
+  { value: "jam", label: "ג'אם" },
+  { value: "underscore", label: "אנדרסקור" },
+  { value: "workshop", label: "סדנה" },
+  { value: "retreat", label: "ריטריט" },
+  { value: "warmup", label: "חימום" },
+  { value: "course", label: "קורס" },
+  { value: "score", label: "סקור" },
+  // { value: "conference", label: "כנס" },
+];
+export interface SelectOption {
+  value: string;
+  label: string;
 }
