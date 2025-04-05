@@ -41,13 +41,7 @@ export async function POST(request: Request) {
     }
 
     //TODO: send message to user
-    await twilio.sendWhatsAppMessage({
-      to: messageData.From,
-      contentSid: process.env.TWILIO_TEMPLATE_SELECT_SETUP_OR_REGION!,
-      contentVariables: {
-        name: messageData.ProfileName,
-      },
-    });
+    await twilio.sendFirstQuestion(messageData.From);
 
     return NextResponse.json({ status: "success" });
   } catch (error) {
