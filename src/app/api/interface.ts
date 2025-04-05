@@ -50,6 +50,16 @@ export enum EventlyType {
   score = "score",
 }
 
+export enum Region {
+  center = "center",
+  jerusalem = "jerusalem",
+  galilee = "galilee",
+  haifa = "haifa",
+  carmel = "carmel",
+  pardesHanna = "pardesHanna",
+  south = "south",
+}
+
 export const districtOptions: SelectOption[] = [
   { value: "center", label: "מרכז" },
   { value: "jerusalem", label: "ירושלים" },

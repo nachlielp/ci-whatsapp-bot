@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server";
 import { supabase } from "../../Supabase";
 import { twilio } from "@/app/Twilio";
-import { EventlyType } from "../interface";
-import { filterCIEventsByType, formatCIEventsList } from "@/util/utilService";
+import { EventlyType, Region } from "../interface";
+import {
+  filterCIEventsByType,
+  formatCIEventsList,
+  emptyRegionMessage,
+} from "@/util/utilService";
 // import { twilio } from "@/app/Twilio";
 
 export async function POST(request: Request) {
@@ -113,7 +117,14 @@ export async function POST(request: Request) {
           EventlyType.score,
         ]);
         const formattedEvents = formatCIEventsList(filteredEvents);
-        await twilio.sendText(messageData.From, formattedEvents);
+        if (formattedEvents) {
+          await twilio.sendText(messageData.From, formattedEvents);
+        } else {
+          await twilio.sendText(
+            messageData.From,
+            emptyRegionMessage(region as Region)
+          );
+        }
       } else if (type) {
         const ci_events = await supabase.getCIEvents();
         const filteredEvents = filterCIEventsByType(ci_events, [

@@ -1,4 +1,9 @@
-import { CIEventList, EventlyType } from "@/app/api/interface";
+import {
+  CIEventList,
+  districtOptions,
+  EventlyType,
+  Region,
+} from "@/app/api/interface";
 import dayjs from "dayjs";
 import "dayjs/locale/he";
 
@@ -87,4 +92,9 @@ function formatTime(event: CIEventList) {
 
 function formatEventUrl(event: CIEventList) {
   return `${process.env.CI_EVENTS_DOMAIN}/event/${event.short_id}`;
+}
+
+export function emptyRegionMessage(region: Region) {
+  const regionHebrew = districtOptions.find((r) => r.value === region)?.label;
+  return `אין במערכת אירועים השבוע ב${regionHebrew}`;
 }
