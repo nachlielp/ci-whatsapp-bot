@@ -31,16 +31,16 @@ class Twilio {
   async sendWhatsAppMessage({
     to,
     contentSid,
-  }: // contentVariables,
-  WhatsAppMessage): Promise<MessageInstance> {
+    contentVariables,
+  }: WhatsAppMessage): Promise<MessageInstance> {
     const result = await tryCatch(
       this.client.messages.create({
         from: `whatsapp:${this.fromNumber}`,
         to: `whatsapp:${to}`,
         contentSid,
-        // contentVariables: contentVariables
-        //   ? JSON.stringify(contentVariables)
-        //   : undefined,
+        contentVariables: contentVariables
+          ? JSON.stringify(contentVariables)
+          : undefined,
       })
     );
 

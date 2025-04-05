@@ -44,6 +44,9 @@ export async function POST(request: Request) {
     await twilio.sendWhatsAppMessage({
       to: messageData.From,
       contentSid: process.env.TWILIO_TEMPLATE_SELECT_SETUP_OR_REGION!,
+      contentVariables: {
+        name: messageData.ProfileName,
+      },
     });
 
     return NextResponse.json({ status: "success" });
