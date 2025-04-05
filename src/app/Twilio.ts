@@ -67,20 +67,13 @@ class Twilio {
     return result.data;
   }
 
-  async sendFirstQuestion(
-    to: string
-    // question: string,
-    // options: string[]
-  ): Promise<MessageInstance> {
+  async sendFirstQuestion(to: string): Promise<MessageInstance> {
     const result = await tryCatch(
       this.client.messages.create({
-        from: `whatsapp:${process.env.TWILIO_FROM_NUMBER}`,
+        from: `whatsapp:${this.fromNumber}`,
         to: `whatsapp:${to}`,
-        // body: question,
-        contentSid: process.env.TWILIO_TEMPLATE_SELECT_SETUP_OR_REGION!, //select_regions
-        // contentVariables: JSON.stringify({
-        //   options: options.join(","),
-        // }),
+        contentSid: process.env.TWILIO_TEMPLATE_SELECT_SETUP_OR_REGION!,
+        contentVariables: JSON.stringify({}), // Add empty content variables if your template doesn't require any
       })
     );
 
