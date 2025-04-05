@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabase } from "../../Supabase";
 import { twilio } from "@/app/Twilio";
-import { EventlyType, Region } from "../interface";
+import { EventlyType, Region, EventListType } from "../interface";
 import {
   filterCIEventsByType,
   formatCIEventsList,
@@ -83,7 +83,10 @@ export async function POST(request: Request) {
             EventlyType.retreat,
             EventlyType.workshop,
           ]);
-          const formattedEvents = formatCIEventsList(filteredEvents);
+          const formattedEvents = formatCIEventsList(
+            filteredEvents,
+            EventListType.courses
+          );
           await twilio.sendText(messageData.From, formattedEvents);
           break;
 
@@ -123,7 +126,11 @@ export async function POST(request: Request) {
           EventlyType.underscore,
           EventlyType.score,
         ]);
-        const formattedEvents = formatCIEventsList(filteredEvents);
+        const formattedEvents = formatCIEventsList(
+          filteredEvents,
+          EventListType.james,
+          region as Region
+        );
         if (formattedEvents) {
           await twilio.sendText(messageData.From, formattedEvents);
         } else {

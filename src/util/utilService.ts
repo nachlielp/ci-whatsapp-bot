@@ -65,7 +65,7 @@ export function filterCIEventsByType(
 export function formatCIEventsList(
   events: CIEventList[],
   eventListType: EventListType,
-  region: Region
+  region?: Region
 ) {
   const regionHebrew = districtOptions.find((r) => r.value === region)?.label;
   const jamesTitle = `*ג׳אמים ושיעורים ב${regionHebrew} בשבוע הקרוב*`;
@@ -112,5 +112,5 @@ function formatEventUrl(event: CIEventList) {
 
 export function emptyRegionMessage(region: Region) {
   const regionHebrew = districtOptions.find((r) => r.value === region)?.label;
-  return `אין במערכת אירועים השבוע ב${regionHebrew}`;
+  return `*אין במערכת אירועים השבוע ב${regionHebrew}*`;
 }
