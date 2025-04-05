@@ -7,6 +7,7 @@ import dotenv from "dotenv";
 import { tryCatch } from "@/util/tryCatch";
 import dayjs from "dayjs";
 import { CIEventList } from "./api/interface";
+import { getWeeklyFilterFromBody } from "@/util/utilService";
 dotenv.config();
 
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -25,7 +26,7 @@ interface WAMessage {
 
 interface WAUser {
   name: string;
-  phone_number: string;
+  phone: string;
   created_at: string;
   id: string;
   filter: object;
@@ -158,6 +159,40 @@ class Supabase {
     } catch (e) {
       console.error("Error getting CI events by region:", e);
       return [];
+    }
+  }
+
+  async setWeeklyFilter(user: WAUser, body: string) {
+    const weeklyFilter = getWeeklyFilterFromBody(body);
+    try {
+      const result = await this.supabase
+        .from("wa-users")
+        .update({ filter: weeklyFilter, is_subscribed: true })
+        .eq("id", user.id)
+        .select("filter")
+        .single();
+
+      console.log("setWeeklyFilter.result", result);
+      return result.data?.filter ?? [];
+    } catch (e) {
+      console.error("Error setting weekly filter:", e);
+      return null;
+    }
+  }
+
+  async unsubscribeFromWeeklyFilter(user: WAUser) {
+    try {
+      const result = await this.supabase
+        .from("wa-users")
+        .update({ is_subscribed: false })
+        .eq("id", user.id)
+        .select("is_subscribed")
+        .single();
+
+      return result?.data?.is_subscribed ?? undefined;
+    } catch (e) {
+      console.error("Error unsubscribing from weekly filter:", e);
+      return undefined;
     }
   }
 }

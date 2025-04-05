@@ -114,3 +114,51 @@ export function emptyRegionMessage(region: Region) {
   const regionHebrew = districtOptions.find((r) => r.value === region)?.label;
   return `*אין במערכת אירועים השבוע ב${regionHebrew}*`;
 }
+
+export function setupWeeklyMessage() {
+  return `על מנת להגדיר את הפילטר, שילחו *הודעה אחת* עם המילה *שבועי* והמספרים של האזורים בהם אתם מעוניינים.
+1 - ירושלים
+2 - מרכז
+3 - דרום
+4 - פרדס חנה
+5 - חוף הכרמל
+6 - חיפה
+7 - גליל
+
+לדוגמה עבור ירושלים ומרכז שילחו:
+שבועי 1 2 
+`;
+}
+
+export function getWeeklyFilterFromBody(body: string) {
+  const weeklyFilter: Region[] = [];
+  if (body.includes("1")) {
+    weeklyFilter.push(Region.jerusalem);
+  }
+  if (body.includes("2")) {
+    weeklyFilter.push(Region.center);
+  }
+  if (body.includes("3")) {
+    weeklyFilter.push(Region.south);
+  }
+  if (body.includes("4")) {
+    weeklyFilter.push(Region.pardesHanna);
+  }
+  if (body.includes("5")) {
+    weeklyFilter.push(Region.carmel);
+  }
+  if (body.includes("6")) {
+    weeklyFilter.push(Region.haifa);
+  }
+  if (body.includes("7")) {
+    weeklyFilter.push(Region.galilee);
+  }
+  return weeklyFilter;
+}
+
+export function formatSubscribedRegions(regions: Region[]) {
+  const regionHebrew = regions
+    .map((region) => districtOptions.find((r) => r.value === region)?.label)
+    .join(", ");
+  return `*נרשמתם בהצלחה לקבל עדכון שבועי על אירועים באיזורים הבאים: ${regionHebrew}*`;
+}

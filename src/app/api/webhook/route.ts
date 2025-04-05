@@ -29,6 +29,7 @@ export async function POST(request: Request) {
       });
     }
 
+    console.log("_user", user);
     // Store the message data in the database
     const result = await supabase.receiveMessage({
       blob: messageData,
@@ -48,12 +49,16 @@ export async function POST(request: Request) {
 
     if (messageData.MessageType === "text") {
       if (messageData.Body.includes("הסר")) {
-        console.log(`_debug_1_from: ${messageData.From} contins "הסר"`);
-        //TODO: remove reminder for user
+        const unsubscribed = await supabase.unsubscribeFromWeeklyFilter(user);
+        if (unsubscribed === false) {
+          await twilio.sendText(messageData.From, `*הוסרתם בצלחה*`);
+        } else {
+          await twilio.sendText(
+            `whatsapp:${user.phone}`,
+            `*ישנה תקלה בהסרה, אנא צרו איתנו קשר במייל* info@ci-events.org`
+          );
+        }
       } else {
-        console.log(
-          `_debug_2_from: ${messageData.From} , sid: ${process.env.TWILIO_TEMPLATE_FIRST_MESSAGE}`
-        );
         await twilio.sendTemplate(
           messageData.From,
           process.env.TWILIO_TEMPLATE_FIRST_MESSAGE!
