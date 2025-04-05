@@ -1,8 +1,4 @@
-import {
-  createClient,
-  SupabaseClient,
-  //   PostgrestSingleResponse,
-} from "@supabase/supabase-js";
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import dotenv from "dotenv";
 import { tryCatch } from "@/util/tryCatch";
 import dayjs from "dayjs";
@@ -12,8 +8,6 @@ dotenv.config();
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ACCOUNT_KEY;
-
-// Define the structure of your wa-messages table
 
 class Supabase {
   supabase: SupabaseClient;
@@ -46,7 +40,7 @@ class Supabase {
         })
         .select("*")
         .single();
-      console.log("receiveMessage.result", result);
+
       return result.data as WAMessage;
     } catch (e) {
       //Sentery
@@ -72,7 +66,6 @@ class Supabase {
         .select()
         .single();
 
-      console.log("createUser.result", result);
       return result.data as WAUser;
     } catch (error) {
       console.error("Error creating user:", error);
@@ -90,8 +83,6 @@ class Supabase {
           .single()
       )
     );
-
-    console.log("_1_result", result);
 
     return result.data?.data as WAUser;
   }
@@ -121,6 +112,7 @@ class Supabase {
       return [];
     }
   }
+
   async getCIEventsByRegions(
     regions: Region[],
     formDate: string = dayjs().format("YYYY-MM-DD"),

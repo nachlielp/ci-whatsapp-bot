@@ -27,29 +27,6 @@ class Twilio {
     this.fromNumber = fromNumber;
   }
 
-  async sendWhatsAppMessage({
-    to,
-    contentSid,
-    contentVariables,
-  }: WhatsAppMessage): Promise<MessageInstance> {
-    const result = await tryCatch(
-      this.client.messages.create({
-        from: `whatsapp:${this.fromNumber}`,
-        to: `whatsapp:${to}`,
-        contentSid,
-        contentVariables: contentVariables
-          ? JSON.stringify(contentVariables)
-          : undefined,
-      })
-    );
-
-    if (result.error) {
-      throw new Error(`Failed to send WhatsApp message: ${result.error}`);
-    }
-
-    return result.data;
-  }
-
   async sendText(to: string, body: string): Promise<MessageInstance> {
     const result = await tryCatch(
       this.client.messages.create({
@@ -83,8 +60,6 @@ class Twilio {
         contentVariables: JSON.stringify(contentVariables),
       })
     );
-
-    console.log("sendTemplate.result", result);
 
     if (result.error) {
       throw new Error(`Failed to send first question: ${result.error}`);
