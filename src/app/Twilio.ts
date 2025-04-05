@@ -79,7 +79,7 @@ class Twilio {
     const result = await tryCatch(
       this.client.messages.create({
         from: `whatsapp:${this.fromNumber}`,
-        to: `whatsapp:${to}`,
+        to: `${to}`,
         contentSid,
         contentVariables: JSON.stringify({}), // Add empty content variables if your template doesn't require any
       })
