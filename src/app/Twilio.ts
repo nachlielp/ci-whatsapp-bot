@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 import { Twilio as TwilioClient } from "twilio";
 import type { MessageInstance } from "twilio/lib/rest/api/v2010/account/message";
 import { tryCatch } from "@/util/tryCatch";
-
+import { CIEventList } from "./api/interface";
 dotenv.config();
 
 interface WhatsAppMessage {
@@ -66,12 +66,17 @@ class Twilio {
 
     return result.data;
   }
-  async sendWeeksCIEvents(to: string, events: any[]): Promise<MessageInstance> {
+  async sendWeeksCIEvents(
+    to: string,
+    events: CIEventList[]
+  ): Promise<MessageInstance> {
     const result = await tryCatch(
       this.client.messages.create({
         from: `whatsapp:${this.fromNumber}`,
         to: `whatsapp:${to}`,
-        body: events.map((event) => event.title).join("\n"),
+        body: events
+          .map((event) => `${event.title} - ${event.start_date}`)
+          .join("\n"),
       })
     );
 

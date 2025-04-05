@@ -6,6 +6,7 @@ import {
 import dotenv from "dotenv";
 import { tryCatch } from "@/util/tryCatch";
 import dayjs from "dayjs";
+import { CIEventList } from "./api/interface";
 dotenv.config();
 
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -120,13 +121,21 @@ class Supabase {
     try {
       const result = await this.supabase
         .from("ci_events")
-        .select("*")
+        .select("id, short_id, title,  address, start_date, end_date")
         .eq("district", region)
         .gte("start_date", formDate)
-        .lte("start_date", toDate);
+        .lte("start_date", toDate)
+        .not("hide", "is", true)
+        .not("cancelled", "is", true);
+
+      const list: CIEventList[] =
+        result.data?.map((event) => ({
+          title: event.title,
+          start_date: event.start_date,
+        })) ?? [];
 
       console.log("getCIEventsByRegion.result", result);
-      return result.data as any[];
+      return list;
     } catch (e) {
       console.error("Error getting CI events by region:", e);
       return [];
