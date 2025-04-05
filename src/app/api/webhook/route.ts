@@ -60,7 +60,6 @@ export async function POST(request: Request) {
         );
       }
     } else if (messageData.MessageType === "interactive") {
-      let type;
       switch (messageData.ButtonPayload) {
         case "event_types_james":
           await twilio.sendTemplate(
@@ -77,7 +76,15 @@ export async function POST(request: Request) {
           );
           break;
         case "first_message_courses":
-          type = EventlyType.course;
+          const ci_events = await supabase.getCIEvents();
+          console.log("ci_events", ci_events);
+          const filteredEvents = filterCIEventsByType(ci_events, [
+            EventlyType.course,
+            EventlyType.retreat,
+            EventlyType.workshop,
+          ]);
+          const formattedEvents = formatCIEventsList(filteredEvents);
+          await twilio.sendText(messageData.From, formattedEvents);
           break;
 
         default:
@@ -125,15 +132,6 @@ export async function POST(request: Request) {
             emptyRegionMessage(region as Region)
           );
         }
-      } else if (type) {
-        const ci_events = await supabase.getCIEvents();
-        const filteredEvents = filterCIEventsByType(ci_events, [
-          EventlyType.retreat,
-          EventlyType.workshop,
-          EventlyType.course,
-        ]);
-        const formattedEvents = formatCIEventsList(filteredEvents);
-        await twilio.sendText(messageData.From, formattedEvents);
       }
     }
 
