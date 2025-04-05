@@ -129,10 +129,12 @@ class Supabase {
         .not("cancelled", "is", true);
 
       const list: CIEventList[] =
-        result.data?.map((event) => ({
-          title: event.title,
-          start_date: event.start_date,
-        })) ?? [];
+        result.data
+          ?.sort((a, b) => dayjs(a.start_date).diff(dayjs(b.start_date)))
+          .map((event) => ({
+            title: event.title,
+            start_date: event.start_date,
+          })) ?? [];
 
       console.log("getCIEventsByRegion.result", result);
       return list;
