@@ -48,7 +48,7 @@ export async function POST(request: Request) {
       } else {
         await twilio.sendTemplate(
           messageData.From,
-          process.env.TWILIO_TEMPLATE_SELECT_SETUP_OR_REGION!
+          process.env.TWILIO_TEMPLATE_FIRST_MESSAGE!
         );
       }
     } else if (messageData.MessageType === "interactive") {
@@ -69,7 +69,6 @@ export async function POST(request: Request) {
           type = EventlyType.workshop;
           break;
         default:
-        // await twilio.sendFirstQuestion(messageData.From);
       }
 
       let region;

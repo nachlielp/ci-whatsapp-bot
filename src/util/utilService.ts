@@ -61,22 +61,27 @@ export function formatCIEventsList(events: CIEventList[]) {
     .sort((a, b) => dayjs(a.start_date).diff(dayjs(b.start_date)))
     .map(
       (event) =>
-        `${event.title} \n ${hebrewDate(event.start_date)} ${formatTime(
+        `*${event.title}* \n יום ${hebrewDate(event.start_date)} ${formatTime(
           event
-        )} ${event.address.label} ${formatEventUrl(event)}`
+        )} ${event.address.label} \n  ${formatEventUrl(event)}`
     )
     .join("\n\n");
 }
 
 function hebrewDate(date: string) {
-  return dayjs(date).locale("he").format("dddd, D MMMM") + "\n";
+  return (
+    dayjs(date).locale("he").format("dddd, D") +
+    " ב" +
+    dayjs(date).locale("he").format(" MMMM") +
+    "\n"
+  );
 }
 
 function formatTime(event: CIEventList) {
   if (!event.is_multi_day) {
-    return `${dayjs(event.segments[0].startTime).format("HH:mm")} - ${dayjs(
-      event.segments[event.segments.length - 1].endTime
-    ).format("HH:mm")} \n`;
+    return `${dayjs(event.segments[event.segments.length - 1].startTime).format(
+      "HH:mm"
+    )} - ${dayjs(event.segments[0].endTime).format("HH:mm")} \n`;
   }
 }
 

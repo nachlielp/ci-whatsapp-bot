@@ -1,14 +1,24 @@
-import { supabase } from "@/app/Supabase";
 import { NextResponse } from "next/server";
 import { twilio } from "@/app/Twilio";
+import { filterCIEventsByType } from "@/util/utilService";
 import { formatCIEventsList } from "@/util/utilService";
+import { EventlyType } from "../interface";
+import { supabase } from "@/app/Supabase";
 export async function GET() {
   console.log("test");
-  const events = await supabase.getCIEventsByRegion("jerusalem");
-  const res = await twilio.sendText(
-    "+972584994306",
-    formatCIEventsList(events)
-  );
+  //   const res = await twilio.sendTemplate(
+  //     "whatsapp:+972584994306",
+  //     process.env.TWILIO_TEMPLATE_SELECT_REGION!
+  //   );
+  const ci_events = await supabase.getCIEventsByRegion("center");
+  const filteredEvents = filterCIEventsByType(ci_events, [
+    EventlyType.class,
+    EventlyType.jame,
+    EventlyType.underscore,
+    EventlyType.score,
+  ]);
+  const formattedEvents = formatCIEventsList(filteredEvents);
+  const res = await twilio.sendText("whatsapp:+972584994306", formattedEvents);
   //   const res = await twilio.sendWhatsAppText("+972584994306", "hellow world");
   return NextResponse.json(res);
 }
