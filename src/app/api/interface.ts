@@ -68,6 +68,7 @@ export const districtOptions: SelectOption[] = [
   { value: "carmel", label: "חוף כרמל" },
   { value: "pardesHanna", label: "פרדס חנה" },
   { value: "south", label: "דרום" },
+  { value: "north", label: "צפון" },
 ];
 export const eventOptions: SelectOption[] = [
   { value: "class", label: "שיעור" },

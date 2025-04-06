@@ -51,15 +51,10 @@ export async function POST(request: Request) {
 
     if (messageData.MessageType === "text") {
       if (messageData.Body.includes("הסר")) {
-        const unsubscribed = await supabase.unsubscribeFromWeeklyFilter(user);
-        if (unsubscribed === false) {
-          await twilio.sendText(messageData.From, `*הוסרתם בצלחה*`);
-        } else {
-          await twilio.sendText(
-            `whatsapp:${user.phone}`,
-            `*ישנה תקלה בהסרה, אנא צרו איתנו קשר במייל* info@ci-events.org`
-          );
-        }
+        await twilio.sendTemplate(
+          messageData.From,
+          process.env.TWILIO_TEMPLATE_CONFIRM_REMOVE!
+        );
       } else if (messageData.Body.includes("שבועי")) {
         const regions = await supabase.setWeeklyFilter(user, messageData.Body);
         await twilio.sendText(
