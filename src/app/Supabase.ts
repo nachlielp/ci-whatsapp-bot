@@ -92,13 +92,19 @@ class Supabase {
     formDate: string = dayjs().format("YYYY-MM-DD"),
     toDate: string = dayjs().add(7, "day").format("YYYY-MM-DD")
   ) {
+    let districts = [];
+    if (region === "north") {
+      districts = ["haifa", "pardesHanna", "carmel", "galilee"];
+    } else {
+      districts = [region];
+    }
     try {
       const result = await this.supabase
         .from("ci_events")
         .select(
           "id, short_id, title,  address, start_date, end_date,segments, type,is_multi_day"
         )
-        .eq("district", region)
+        .in("district", districts)
         .gte("start_date", formDate)
         .lte("start_date", toDate)
         .not("hide", "is", true)

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-// import { twilio } from "@/app/Twilio";
+import { twilio } from "@/app/Twilio";
 // import { supabase } from "@/app/Supabase";
 // import { districtOptions } from "../interface";
 
@@ -20,12 +20,12 @@ export async function GET() {
   //   }
   // );
   // console.log("res", res);
-  // const res = await twilio.sendTemplate(
-  //   "whatsapp:+972584994306",
-  //   "HX62753712f8f915f3c8258b3473493025",
-  //   {}
-  // );
+  const res = await twilio.sendTemplate(
+    "whatsapp:+972584994306",
+    "HXf7f623136b716ed7fce6d85318145747",
+    {}
+  );
 
-  throw new Error("test error blabla");
-  return NextResponse.json({});
+  // throw new Error("test error blabla");
+  return NextResponse.json({ res });
 }

@@ -103,11 +103,8 @@ export function setupWeeklyMessage() {
   return `על מנת להגדיר את הפילטר, שילחו *הודעה אחת* עם המילה *שבועי* והמספרים של האזורים בהם אתם מעוניינים.
 1 - ירושלים
 2 - מרכז
-3 - דרום
-4 - פרדס חנה
-5 - חוף הכרמל
-6 - חיפה
-7 - גליל
+3 - צפון
+4 - דרום
 
 לדוגמה עבור ירושלים ומרכז שילחו:
 שבועי 1 2 
@@ -123,20 +120,14 @@ export function getWeeklyFilterFromBody(body: string) {
     weeklyFilter.push(Region.center);
   }
   if (body.includes("3")) {
-    weeklyFilter.push(Region.south);
+    weeklyFilter.push(
+      ...[Region.pardesHanna, Region.carmel, Region.haifa, Region.galilee]
+    );
   }
   if (body.includes("4")) {
-    weeklyFilter.push(Region.pardesHanna);
+    weeklyFilter.push(Region.south);
   }
-  if (body.includes("5")) {
-    weeklyFilter.push(Region.carmel);
-  }
-  if (body.includes("6")) {
-    weeklyFilter.push(Region.haifa);
-  }
-  if (body.includes("7")) {
-    weeklyFilter.push(Region.galilee);
-  }
+
   return weeklyFilter;
 }
 
