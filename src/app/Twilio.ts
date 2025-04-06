@@ -4,12 +4,6 @@ import type { MessageInstance } from "twilio/lib/rest/api/v2010/account/message"
 import { tryCatch } from "@/util/tryCatch";
 dotenv.config();
 
-interface WhatsAppMessage {
-  to: string;
-  contentSid: string;
-  contentVariables?: Record<string, string>;
-}
-
 class Twilio {
   private client: TwilioClient;
   private fromNumber: string;

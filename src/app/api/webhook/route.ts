@@ -116,6 +116,29 @@ export async function POST(request: Request) {
             weeklyScheduleTitle + "\n\n" + formattedWeeklyScheduleEvents
           );
           break;
+        case "weekly_schedule_remove":
+          await twilio.sendTemplate(
+            messageData.From,
+            process.env.TWILIO_TEMPLATE_CONFIRM_REMOVE!
+          );
+          break;
+        case "confirm_remove_yes":
+          const unsubscribed = await supabase.unsubscribeFromWeeklyFilter(user);
+          if (unsubscribed === false) {
+            await twilio.sendText(messageData.From, `*הוסרתם בצלחה*`);
+          } else {
+            await twilio.sendText(
+              `whatsapp:${user.phone}`,
+              `*ישנה תקלה בהסרה, אנא צרו איתנו קשר במייל* info@ci-events.org`
+            );
+          }
+          break;
+        case "confirm_remove_no":
+          await twilio.sendTemplate(
+            messageData.From,
+            process.env.TWILIO_TEMPLATE_FIRST_MESSAGE!
+          );
+          break;
         default:
       }
 
