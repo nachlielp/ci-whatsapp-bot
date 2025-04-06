@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { twilio } from "@/app/Twilio";
-import { supabase } from "@/app/Supabase";
-import { districtOptions } from "../interface";
+// import { twilio } from "@/app/Twilio";
+// import { supabase } from "@/app/Supabase";
+// import { districtOptions } from "../interface";
 
 export async function GET() {
   // const user = await supabase.getUserByPhoneNumber("972584994306");
