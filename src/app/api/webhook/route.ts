@@ -37,21 +37,6 @@ export async function POST(request: Request) {
 
     console.log("_user", user);
     // Store the message data in the database
-    const message = await supabase.receiveMessage({
-      blob: messageData,
-      WaId: messageData.WaId,
-      ProfileName: messageData.ProfileName,
-      Body: messageData.Body,
-      MessageType: messageData.MessageType,
-      user_id: user.id,
-    });
-
-    if (!message) {
-      return NextResponse.json({
-        status: "error",
-        message: "Failed to process webhook",
-      });
-    }
 
     const processingTime1 = Date.now();
 
@@ -188,12 +173,24 @@ export async function POST(request: Request) {
 
     const processingTime2 = Date.now();
 
-    await supabase.logProcessingTime(
-      message.id,
-      `step 1: ${processingTime1 - startTime} , step 2: ${
-        processingTime2 - processingTime1
-      }`
-    );
+    const message = await supabase.receiveMessage({
+      blob: messageData,
+      WaId: messageData.WaId,
+      ProfileName: messageData.ProfileName,
+      Body: messageData.Body,
+      MessageType: messageData.MessageType,
+      user_id: user.id,
+      processing_time_ms: `step 1 get user: ${
+        processingTime1 - startTime
+      } , step 2 - process message: ${processingTime2 - processingTime1} `,
+    });
+
+    if (!message) {
+      return NextResponse.json({
+        status: "error",
+        message: "Failed to process webhook",
+      });
+    }
 
     return NextResponse.json({ status: "success" });
   } catch (error) {
