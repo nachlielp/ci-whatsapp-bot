@@ -22,7 +22,7 @@ export async function GET() {
   // console.log("res", res);
   const res = await twilio.sendTemplate(
     "whatsapp:+972584994306",
-    "HXf7f623136b716ed7fce6d85318145747",
+    "HX01c011cdf6f855cdba8ab9fc1014c67f",
     {}
   );
 

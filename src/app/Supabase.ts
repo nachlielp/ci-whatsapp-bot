@@ -26,7 +26,7 @@ class Supabase {
     Body,
     MessageType,
     user_id,
-  }: WAMessage): Promise<WAMessage | null> {
+  }: Omit<WAMessage, "id">): Promise<WAMessage | null> {
     try {
       const result = await this.supabase
         .from("wa-messages")
@@ -144,6 +144,7 @@ class Supabase {
       return [];
     }
   }
+
   async getCIEvents(
     formDate: string = dayjs().format("YYYY-MM-DD"),
     toDate: string = dayjs().add(60, "day").format("YYYY-MM-DD")
@@ -199,6 +200,20 @@ class Supabase {
     } catch (e) {
       console.error("Error unsubscribing from weekly filter:", e);
       return undefined;
+    }
+  }
+
+  async logProcessingTime(id: string, processing_time_ms: number) {
+    try {
+      const result = await this.supabase
+        .from("wa-messages")
+        .update({ processing_time_ms })
+        .eq("id", id);
+
+      return result.data;
+    } catch (e) {
+      console.error("Error logging processing time:", e);
+      return null;
     }
   }
 }

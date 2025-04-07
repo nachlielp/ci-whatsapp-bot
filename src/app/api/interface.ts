@@ -91,12 +91,14 @@ export enum EventListType {
   courses = "courses",
 }
 export interface WAMessage {
+  id: string;
   blob: Record<string, unknown>;
   WaId: string;
   ProfileName: string;
   Body: string;
   MessageType: string;
   user_id: string;
+  processing_time_ms?: number;
 }
 
 export interface WAUser {

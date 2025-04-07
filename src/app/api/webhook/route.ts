@@ -12,6 +12,7 @@ import {
 // import { twilio } from "@/app/Twilio";
 
 export async function POST(request: Request) {
+  const startTime = Date.now(); // Capture start time
   try {
     // Parse the request body
     const formData = await request.formData();
@@ -33,7 +34,7 @@ export async function POST(request: Request) {
 
     console.log("_user", user);
     // Store the message data in the database
-    const result = await supabase.receiveMessage({
+    const message = await supabase.receiveMessage({
       blob: messageData,
       WaId: messageData.WaId,
       ProfileName: messageData.ProfileName,
@@ -42,7 +43,7 @@ export async function POST(request: Request) {
       user_id: user.id,
     });
 
-    if (!result) {
+    if (!message) {
       return NextResponse.json({
         status: "error",
         message: "Failed to process webhook",
@@ -179,6 +180,11 @@ export async function POST(request: Request) {
         }
       }
     }
+
+    await supabase.logProcessingTime(
+      message.id,
+      Date.now() - startTime // Calculate actual processing time
+    );
 
     return NextResponse.json({ status: "success" });
   } catch (error) {
