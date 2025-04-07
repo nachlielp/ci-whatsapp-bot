@@ -7,6 +7,12 @@ import {
 import dayjs from "dayjs";
 import "dayjs/locale/he";
 
+export function filterEventsByRegions(
+  events: CIEventList[],
+  regions: Region[]
+) {
+  return events.filter((event) => regions.includes(event.district));
+}
 export function filterJamsAndClasses(events: CIEventList[]) {
   const eventTypes = [
     EventlyType.class,

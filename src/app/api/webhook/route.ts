@@ -8,6 +8,7 @@ import {
   emptyRegionMessage,
   setupWeeklyMessage,
   formatSubscribedRegions,
+  filterEventsByRegions,
 } from "@/util/utilService";
 // import { twilio } from "@/app/Twilio";
 
@@ -22,21 +23,11 @@ export async function POST(request: Request) {
     formData.forEach((value, key) => {
       messageData[key] = value.toString();
     });
-    const user = await supabase.upsertUser({
-      name: messageData.ProfileName,
-      phoneNumber: messageData.WaId,
-    });
-    // let user = await supabase.getUserByPhoneNumber(messageData.WaId);
 
-    // if (!user) {
-    //   user = await supabase.createUser({
-    //     name: messageData.ProfileName,
-    //     phoneNumber: messageData.WaId,
-    //   });
-    // }
-
-    console.log("_user", user);
-    // Store the message data in the database
+    // const user = await supabase.upsertUser({
+    //   name: messageData.ProfileName,
+    //   phoneNumber: messageData.WaId,
+    // });
 
     const processingTime1 = Date.now();
 
@@ -47,11 +38,17 @@ export async function POST(request: Request) {
           process.env.TWILIO_TEMPLATE_CONFIRM_REMOVE!
         );
       } else if (messageData.Body.includes("שבועי")) {
-        const regions = await supabase.setWeeklyFilter(user, messageData.Body);
-        await twilio.sendText(
-          `whatsapp:${user.phone}`,
-          formatSubscribedRegions(regions)
+        const user = await supabase.setWeeklyFilter(
+          messageData.ProfileName,
+          messageData.WaId,
+          messageData.Body
         );
+        if (user) {
+          await twilio.sendText(
+            `whatsapp:${user.phone}`,
+            formatSubscribedRegions(user.filter)
+          );
+        }
       } else {
         await twilio.sendTemplate(
           messageData.From,
@@ -92,11 +89,31 @@ export async function POST(request: Request) {
           );
           break;
         case "weekly_schedule_events":
-          const weeklyScheduleTitle = `*אירועים בשבוע הקרוב ב${user.filter
-            .map((r) => districtOptions.find((d) => d.value === r)?.label)
+          const result = await supabase.getUserAndThisWeekEvents(
+            messageData.From
+          );
+          if (!result) {
+            await twilio.sendText(
+              messageData.From,
+              "לא נמצאו אירועים או משתמש"
+            );
+            break;
+          }
+          const { user: weeklyScheduleUser, events: weeklyScheduleEvents } =
+            result;
+          const weeklyScheduleTitle = `*אירועים בשבוע הקרוב ב${weeklyScheduleUser?.filter
+            .map(
+              (r: Region) => districtOptions.find((d) => d.value === r)?.label
+            )
             .join(", ")}*`;
-          const events = await supabase.getCIEventsByRegions(user.filter);
-          const formattedWeeklyScheduleEvents = formatCIEventsList(events);
+
+          const weeklyScheduleFilteredEvents = filterEventsByRegions(
+            weeklyScheduleEvents,
+            weeklyScheduleUser?.filter
+          );
+          const formattedWeeklyScheduleEvents = formatCIEventsList(
+            weeklyScheduleFilteredEvents
+          );
           await twilio.sendText(
             messageData.From,
             weeklyScheduleTitle + "\n\n" + formattedWeeklyScheduleEvents
@@ -109,12 +126,15 @@ export async function POST(request: Request) {
           );
           break;
         case "confirm_remove_yes":
-          const unsubscribed = await supabase.unsubscribeFromWeeklyFilter(user);
+          const phoneNumberToUnsubscribe = messageData.WaId;
+          const unsubscribed = await supabase.unsubscribeFromWeeklyFilter(
+            phoneNumberToUnsubscribe
+          );
           if (unsubscribed === false) {
             await twilio.sendText(messageData.From, `*הוסרתם בצלחה*`);
           } else {
             await twilio.sendText(
-              `whatsapp:${user.phone}`,
+              `${messageData.From}`,
               `*ישנה תקלה בהסרה, אנא צרו איתנו קשר במייל* info@ci-events.org`
             );
           }
@@ -172,6 +192,11 @@ export async function POST(request: Request) {
     }
 
     const processingTime2 = Date.now();
+
+    const user = await supabase.upsertUser({
+      name: messageData.ProfileName,
+      phoneNumber: messageData.WaId,
+    });
 
     const message = await supabase.receiveMessage({
       blob: messageData,

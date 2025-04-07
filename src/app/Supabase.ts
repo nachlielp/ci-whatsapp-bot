@@ -30,7 +30,7 @@ class Supabase {
   }: Omit<WAMessage, "id">): Promise<WAMessage | null> {
     try {
       const result = await this.supabase
-        .from("wa-messages")
+        .from("wa_messages")
         .insert({
           blob: blob,
           WaId: WaId,
@@ -60,7 +60,7 @@ class Supabase {
   }): Promise<WAUser> {
     try {
       const result = await this.supabase
-        .from("wa-users")
+        .from("wa_users")
         .upsert(
           {
             name,
@@ -89,7 +89,7 @@ class Supabase {
   }): Promise<WAUser> {
     try {
       const result = await this.supabase
-        .from("wa-users")
+        .from("wa_users")
         .insert({
           name,
           phone: phoneNumber,
@@ -108,7 +108,7 @@ class Supabase {
     const result = await tryCatch(
       Promise.resolve(
         this.supabase
-          .from("wa-users")
+          .from("wa_users")
           .select("*")
           .eq("phone", phoneNumber)
           .single()
@@ -133,7 +133,7 @@ class Supabase {
       const result = await this.supabase
         .from("ci_events")
         .select(
-          "id, short_id, title,  address, start_date, end_date,segments, type,is_multi_day"
+          "id, short_id, title,  address, start_date, end_date,segments, type,is_multi_day, district"
         )
         .in("district", districts)
         .gte("start_date", formDate)
@@ -159,7 +159,7 @@ class Supabase {
       const result = await this.supabase
         .from("ci_events")
         .select(
-          "id, short_id, title,  address, start_date, end_date,segments, type,is_multi_day"
+          "id, short_id, title,  address, start_date, end_date,segments, type,is_multi_day, district"
         )
         .in("district", regions)
         .gte("start_date", formDate)
@@ -184,7 +184,7 @@ class Supabase {
       const result = await this.supabase
         .from("ci_events")
         .select(
-          "id, short_id, title,  address, start_date, end_date,segments, type,is_multi_day"
+          "id, short_id, title,  address, start_date, end_date,segments, type,is_multi_day, district"
         )
         .gte("start_date", formDate)
         .lte("start_date", toDate)
@@ -200,30 +200,40 @@ class Supabase {
     }
   }
 
-  async setWeeklyFilter(user: WAUser, body: string) {
+  async setWeeklyFilter(name: string, phoneNumber: string, body: string) {
     const weeklyFilter = getWeeklyFilterFromBody(body);
+
     try {
       const result = await this.supabase
-        .from("wa-users")
-        .update({ filter: weeklyFilter, is_subscribed: true })
-        .eq("id", user.id)
-        .select("filter")
+        .from("wa_users")
+        .upsert(
+          {
+            name,
+            phone: phoneNumber,
+            filter: weeklyFilter,
+            is_subscribed: true,
+          },
+          {
+            onConflict: "phone",
+            ignoreDuplicates: false,
+          }
+        )
+        .select()
         .single();
 
-      console.log("setWeeklyFilter.result", result);
-      return result.data?.filter ?? [];
+      return result.data as WAUser;
     } catch (e) {
       console.error("Error setting weekly filter:", e);
       return null;
     }
   }
 
-  async unsubscribeFromWeeklyFilter(user: WAUser) {
+  async unsubscribeFromWeeklyFilter(phoneNumber: string) {
     try {
       const result = await this.supabase
-        .from("wa-users")
+        .from("wa_users")
         .update({ is_subscribed: false })
-        .eq("id", user.id)
+        .eq("phone", phoneNumber)
         .select("is_subscribed")
         .single();
 
@@ -237,13 +247,47 @@ class Supabase {
   async logProcessingTime(id: string, processing_time_ms: string) {
     try {
       const result = await this.supabase
-        .from("wa-messages")
+        .from("wa_messages")
         .update({ processing_time_ms })
         .eq("id", id);
 
       return result.data;
     } catch (e) {
       console.error("Error logging processing time:", e);
+      return null;
+    }
+  }
+
+  async getUserAndThisWeekEvents(phoneNumber: string) {
+    const formDate = dayjs().format("YYYY-MM-DD");
+    const toDate = dayjs().add(7, "day").format("YYYY-MM-DD");
+    // Get user data and events in parallel
+    try {
+      const [userResult, eventsResult] = await Promise.all([
+        this.supabase
+          .from("wa_users")
+          .select("*")
+          .eq("phone", phoneNumber)
+          .single(),
+
+        this.supabase
+          .from("ci_events")
+          .select(
+            "id, short_id, title,  address, start_date, end_date,segments, type,is_multi_day, district  "
+          )
+
+          .gte("start_date", formDate)
+          .lte("start_date", toDate)
+          .not("hide", "is", true)
+          .not("cancelled", "is", true),
+      ]);
+
+      return {
+        user: userResult.data,
+        events: eventsResult.data ?? [],
+      };
+    } catch (e) {
+      console.error("Error getting user and this week events:", e);
       return null;
     }
   }
