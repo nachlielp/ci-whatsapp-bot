@@ -98,7 +98,7 @@ export interface WAMessage {
   Body: string;
   MessageType: string;
   user_id: string;
-  processing_time_ms?: number;
+  processing_time_ms?: string;
 }
 
 export interface WAUser {

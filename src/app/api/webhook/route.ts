@@ -50,6 +50,8 @@ export async function POST(request: Request) {
       });
     }
 
+    const processingTime1 = Date.now() - startTime;
+
     if (messageData.MessageType === "text") {
       if (messageData.Body.includes("הסר")) {
         await twilio.sendTemplate(
@@ -181,9 +183,11 @@ export async function POST(request: Request) {
       }
     }
 
+    const processingTime2 = Date.now() - processingTime1;
+
     await supabase.logProcessingTime(
       message.id,
-      Date.now() - startTime // Calculate actual processing time
+      `step 1: ${processingTime1} , step 2: ${processingTime2}`
     );
 
     return NextResponse.json({ status: "success" });

@@ -203,7 +203,7 @@ class Supabase {
     }
   }
 
-  async logProcessingTime(id: string, processing_time_ms: number) {
+  async logProcessingTime(id: string, processing_time_ms: string) {
     try {
       const result = await this.supabase
         .from("wa-messages")
