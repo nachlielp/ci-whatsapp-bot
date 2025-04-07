@@ -259,6 +259,7 @@ class Supabase {
   }
 
   async getUserAndThisWeekEvents(phoneNumber: string) {
+    console.log("_1_phoneNumber", phoneNumber);
     const formDate = dayjs().format("YYYY-MM-DD");
     const toDate = dayjs().add(7, "day").format("YYYY-MM-DD");
     // Get user data and events in parallel
@@ -283,8 +284,8 @@ class Supabase {
       ]);
 
       return {
-        user: userResult.data,
-        events: eventsResult.data ?? [],
+        user: userResult.data as WAUser,
+        events: eventsResult.data as CIEventList[],
       };
     } catch (e) {
       console.error("Error getting user and this week events:", e);

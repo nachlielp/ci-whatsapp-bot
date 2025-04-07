@@ -90,13 +90,10 @@ export async function POST(request: Request) {
           break;
         case "weekly_schedule_events":
           const result = await supabase.getUserAndThisWeekEvents(
-            messageData.From
+            messageData.WaId
           );
           if (!result) {
-            await twilio.sendText(
-              messageData.From,
-              "לא נמצאו אירועים או משתמש"
-            );
+            await twilio.sendText(messageData.From, "לא נמצאו אירועים/ משתמש");
             break;
           }
           const { user: weeklyScheduleUser, events: weeklyScheduleEvents } =
