@@ -49,6 +49,35 @@ class Supabase {
     }
   }
 
+  async upsertUser({
+    name,
+    phoneNumber,
+  }: {
+    name: string;
+    phoneNumber: string;
+  }): Promise<WAUser> {
+    try {
+      const result = await this.supabase
+        .from("wa-users")
+        .upsert(
+          {
+            name,
+            phone: phoneNumber,
+          },
+          {
+            onConflict: "phone",
+            ignoreDuplicates: false,
+          }
+        )
+        .select()
+        .single();
+
+      return result.data as WAUser;
+    } catch (error) {
+      console.error("Error upserting user:", error);
+      throw error;
+    }
+  }
   async createUser({
     name,
     phoneNumber,

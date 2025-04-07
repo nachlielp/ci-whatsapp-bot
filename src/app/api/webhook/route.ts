@@ -22,15 +22,18 @@ export async function POST(request: Request) {
     formData.forEach((value, key) => {
       messageData[key] = value.toString();
     });
+    const user = await supabase.upsertUser({
+      name: messageData.ProfileName,
+      phoneNumber: messageData.WaId,
+    });
+    // let user = await supabase.getUserByPhoneNumber(messageData.WaId);
 
-    let user = await supabase.getUserByPhoneNumber(messageData.WaId);
-
-    if (!user) {
-      user = await supabase.createUser({
-        name: messageData.ProfileName,
-        phoneNumber: messageData.WaId,
-      });
-    }
+    // if (!user) {
+    //   user = await supabase.createUser({
+    //     name: messageData.ProfileName,
+    //     phoneNumber: messageData.WaId,
+    //   });
+    // }
 
     console.log("_user", user);
     // Store the message data in the database
@@ -50,7 +53,7 @@ export async function POST(request: Request) {
       });
     }
 
-    const processingTime1 = Date.now() - startTime;
+    const processingTime1 = Date.now();
 
     if (messageData.MessageType === "text") {
       if (messageData.Body.includes("הסר")) {
@@ -183,11 +186,13 @@ export async function POST(request: Request) {
       }
     }
 
-    const processingTime2 = Date.now() - processingTime1;
+    const processingTime2 = Date.now();
 
     await supabase.logProcessingTime(
       message.id,
-      `step 1: ${processingTime1} , step 2: ${processingTime2}`
+      `step 1: ${processingTime1 - startTime} , step 2: ${
+        processingTime2 - processingTime1
+      }`
     );
 
     return NextResponse.json({ status: "success" });
