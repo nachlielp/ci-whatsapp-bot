@@ -25,6 +25,7 @@ class Supabase {
     ProfileName,
     Body,
     MessageType,
+    processing_time_ms,
     user_id,
   }: Omit<WAMessage, "id">): Promise<WAMessage | null> {
     try {
@@ -37,6 +38,7 @@ class Supabase {
           Body: Body,
           MessageType: MessageType,
           user_id: user_id,
+          processing_time_ms: processing_time_ms,
         })
         .select("*")
         .single();
