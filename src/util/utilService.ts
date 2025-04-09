@@ -126,9 +126,7 @@ export function getWeeklyFilterFromBody(body: string) {
     weeklyFilter.push(Region.center);
   }
   if (body.includes("3")) {
-    weeklyFilter.push(
-      ...[Region.pardesHanna, Region.carmel, Region.haifa, Region.galilee]
-    );
+    weeklyFilter.push(Region.north);
   }
   if (body.includes("4")) {
     weeklyFilter.push(Region.south);

@@ -59,6 +59,7 @@ export enum Region {
   carmel = "carmel",
   pardesHanna = "pardesHanna",
   south = "south",
+  north = "north",
 }
 
 export const districtOptions: SelectOption[] = [

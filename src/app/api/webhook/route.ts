@@ -24,13 +24,6 @@ export async function POST(request: Request) {
       messageData[key] = value.toString();
     });
 
-    // const user = await supabase.upsertUser({
-    //   name: messageData.ProfileName,
-    //   phoneNumber: messageData.WaId,
-    // });
-
-    const processingTime1 = Date.now();
-
     if (messageData.MessageType === "text") {
       if (messageData.Body.includes("הסר")) {
         await twilio.sendTemplate(
@@ -188,7 +181,7 @@ export async function POST(request: Request) {
       }
     }
 
-    const processingTime2 = Date.now();
+    const processingTime = Date.now();
 
     const user = await supabase.upsertUser({
       name: messageData.ProfileName,
@@ -202,9 +195,7 @@ export async function POST(request: Request) {
       Body: messageData.Body,
       MessageType: messageData.MessageType,
       user_id: user.id,
-      processing_time_ms: `step 1 get user: ${
-        processingTime1 - startTime
-      } , step 2 - process message: ${processingTime2 - processingTime1} `,
+      processing_time_ms: `${processingTime - startTime} `,
     });
 
     if (!message) {
