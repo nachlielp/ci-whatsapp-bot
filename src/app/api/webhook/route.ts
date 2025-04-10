@@ -10,7 +10,6 @@ import {
   formatSubscribedRegions,
   filterEventsByRegions,
 } from "@/util/utilService";
-// import { twilio } from "@/app/Twilio";
 
 export async function POST(request: Request) {
   const startTime = Date.now(); // Capture start time
@@ -48,7 +47,10 @@ export async function POST(request: Request) {
           process.env.TWILIO_TEMPLATE_FIRST_MESSAGE!
         );
       }
-    } else if (messageData.MessageType === "interactive") {
+    } else if (
+      messageData.MessageType === "interactive" ||
+      messageData.MessageType === "button"
+    ) {
       switch (messageData.ButtonPayload) {
         case "first_message_reminder":
           await twilio.sendText(messageData.From, setupWeeklyMessage());
@@ -207,6 +209,8 @@ export async function POST(request: Request) {
           );
         }
       }
+    } else {
+      throw new Error(`Unsupported message type: ${messageData.MessageType}`);
     }
 
     const processingTime = Date.now();
