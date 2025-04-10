@@ -82,15 +82,15 @@ export async function POST(request: Request) {
           );
           break;
         case "weekly_schedule_events":
-          const result = await supabase.getUserAndThisWeekEvents(
+          const userAndWeeklyEvents = await supabase.getUserAndThisWeekEvents(
             messageData.WaId
           );
-          if (!result) {
+          if (!userAndWeeklyEvents) {
             await twilio.sendText(messageData.From, "לא נמצאו אירועים/ משתמש");
             break;
           }
           const { user: weeklyScheduleUser, events: weeklyScheduleEvents } =
-            result;
+            userAndWeeklyEvents;
           const weeklyScheduleTitle = `*אירועים בשבוע הקרוב ב${weeklyScheduleUser?.filter
             .map(
               (r: Region) => districtOptions.find((d) => d.value === r)?.label
@@ -107,6 +107,34 @@ export async function POST(request: Request) {
           await twilio.sendText(
             messageData.From,
             weeklyScheduleTitle + "\n\n" + formattedWeeklyScheduleEvents
+          );
+          break;
+        case "weekend_schedule_events":
+          const userAndWeekendEvents = await supabase.getUserAndThisWeekEvents(
+            messageData.WaId
+          );
+          if (!userAndWeekendEvents) {
+            await twilio.sendText(messageData.From, "לא נמצאו אירועים/ משתמש");
+            break;
+          }
+          const { user: weekendScheduleUser, events: weekendScheduleEvents } =
+            userAndWeekendEvents;
+          const weekendScheduleTitle = `*אירועים בסופ״ש הקרוב ב${weekendScheduleUser?.filter
+            .map(
+              (r: Region) => districtOptions.find((d) => d.value === r)?.label
+            )
+            .join(", ")}*`;
+
+          const weekendScheduleFilteredEvents = filterEventsByRegions(
+            weekendScheduleEvents,
+            weekendScheduleUser?.filter
+          );
+          const formattedWeekendScheduleEvents = formatCIEventsList(
+            weekendScheduleFilteredEvents
+          );
+          await twilio.sendText(
+            messageData.From,
+            weekendScheduleTitle + "\n\n" + formattedWeekendScheduleEvents
           );
           break;
         case "weekly_schedule_remove":

@@ -265,9 +265,18 @@ class Supabase {
   }
 
   async getUserAndThisWeekEvents(phoneNumber: string) {
-    console.log("_1_phoneNumber", phoneNumber);
-    const formDate = dayjs().format("YYYY-MM-DD");
-    const toDate = dayjs().add(7, "day").format("YYYY-MM-DD");
+    const today = dayjs();
+
+    const currentDay = today.day();
+
+    const daysToSaturday = currentDay === 6 ? 0 : 6 - currentDay;
+
+    const formDate = today.format("YYYY-MM-DD");
+
+    const toDate = dayjs(formDate)
+      .add(daysToSaturday, "day")
+      .format("YYYY-MM-DD");
+
     // Get user data and events in parallel
     try {
       const [userResult, eventsResult] = await Promise.all([
