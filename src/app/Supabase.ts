@@ -314,12 +314,11 @@ class Supabase {
     userId: string
   ) {
     try {
-      const result = await this.supabase.from("wa_twilio_results").insert({
+      const result = await this.supabase.from("wa_twilio_logs").insert({
         result: twilioResult,
         wa_users_id: userId,
         wa_messages_id: messageId,
       });
-
       return result.data;
     } catch (e) {
       console.error("Error logging twilio result:", e);
