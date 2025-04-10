@@ -13,6 +13,8 @@ import {
 
 export async function POST(request: Request) {
   const startTime = Date.now(); // Capture start time
+  let twilioResult;
+
   try {
     // Parse the request body
     const formData = await request.formData();
@@ -25,7 +27,7 @@ export async function POST(request: Request) {
 
     if (messageData.MessageType === "text") {
       if (messageData.Body.includes("הסר")) {
-        await twilio.sendTemplate(
+        twilioResult = await twilio.sendTemplate(
           messageData.From,
           process.env.TWILIO_TEMPLATE_CONFIRM_REMOVE!
         );
@@ -36,13 +38,13 @@ export async function POST(request: Request) {
           messageData.Body
         );
         if (user) {
-          await twilio.sendText(
+          twilioResult = await twilio.sendText(
             `whatsapp:${user.phone}`,
             formatSubscribedRegions(user.filter)
           );
         }
       } else {
-        await twilio.sendTemplate(
+        twilioResult = await twilio.sendTemplate(
           messageData.From,
           process.env.TWILIO_TEMPLATE_FIRST_MESSAGE!
         );
@@ -53,16 +55,19 @@ export async function POST(request: Request) {
     ) {
       switch (messageData.ButtonPayload) {
         case "first_message_reminder":
-          await twilio.sendText(messageData.From, setupWeeklyMessage());
+          twilioResult = await twilio.sendText(
+            messageData.From,
+            setupWeeklyMessage()
+          );
           break;
         case "first_message_events":
-          await twilio.sendTemplate(
+          twilioResult = await twilio.sendTemplate(
             messageData.From,
             process.env.TWILIO_TEMPLATE_SELECT_EVENT_TYPES!
           );
           break;
         case "event_types_james":
-          await twilio.sendTemplate(
+          twilioResult = await twilio.sendTemplate(
             messageData.From,
             process.env.TWILIO_TEMPLATE_SELECT_REGION!
           );
@@ -78,7 +83,7 @@ export async function POST(request: Request) {
           const formattedCourseEvents = formatCIEventsList(filteredEvents);
 
           const coursesTitle = `*קורסים וסדנאות וריטריטים בחודשיים הקרובים*`;
-          await twilio.sendText(
+          twilioResult = await twilio.sendText(
             messageData.From,
             coursesTitle + "\n\n" + formattedCourseEvents
           );
@@ -88,15 +93,18 @@ export async function POST(request: Request) {
             messageData.WaId
           );
           if (!userAndWeeklyEvents) {
-            await twilio.sendText(messageData.From, "לא נמצאו אירועים/ משתמש");
+            twilioResult = await twilio.sendText(
+              messageData.From,
+              "לא נמצאו אירועים/ משתמש"
+            );
             break;
           }
           const { user: weeklyScheduleUser, events: weeklyScheduleEvents } =
             userAndWeeklyEvents;
 
           if (!weeklyScheduleUser || weeklyScheduleUser.filter.length === 0) {
-            const noWeeklyFilterMessageTitle = `*לא מוגדר לכם איזורים *`;
-            await twilio.sendText(
+            const noWeeklyFilterMessageTitle = `*לא מוגדר לכם איזורים*`;
+            twilioResult = await twilio.sendText(
               messageData.From,
               noWeeklyFilterMessageTitle + "\n\n" + setupWeeklyMessage()
             );
@@ -115,7 +123,7 @@ export async function POST(request: Request) {
           const formattedWeeklyScheduleEvents = formatCIEventsList(
             weeklyScheduleFilteredEvents
           );
-          await twilio.sendText(
+          twilioResult = await twilio.sendText(
             messageData.From,
             weeklyScheduleTitle + "\n\n" + formattedWeeklyScheduleEvents
           );
@@ -125,15 +133,18 @@ export async function POST(request: Request) {
             messageData.WaId
           );
           if (!userAndWeekendEvents) {
-            await twilio.sendText(messageData.From, "לא נמצאו אירועים/ משתמש");
+            twilioResult = await twilio.sendText(
+              messageData.From,
+              "לא נמצאו אירועים/ משתמש"
+            );
             break;
           }
           const { user: weekendScheduleUser, events: weekendScheduleEvents } =
             userAndWeekendEvents;
 
           if (!weekendScheduleUser || weekendScheduleUser.filter.length === 0) {
-            const noWeeklyFilterMessageTitle = `*לא מוגדר לכם איזורים *`;
-            await twilio.sendText(
+            const noWeeklyFilterMessageTitle = `*לא מוגדר לכם איזורים*`;
+            twilioResult = await twilio.sendText(
               messageData.From,
               noWeeklyFilterMessageTitle + "\n\n" + setupWeeklyMessage()
             );
@@ -153,13 +164,13 @@ export async function POST(request: Request) {
           const formattedWeekendScheduleEvents = formatCIEventsList(
             weekendScheduleFilteredEvents
           );
-          await twilio.sendText(
+          twilioResult = await twilio.sendText(
             messageData.From,
             weekendScheduleTitle + "\n\n" + formattedWeekendScheduleEvents
           );
           break;
         case "weekly_schedule_remove":
-          await twilio.sendTemplate(
+          twilioResult = await twilio.sendTemplate(
             messageData.From,
             process.env.TWILIO_TEMPLATE_CONFIRM_REMOVE!
           );
@@ -170,16 +181,19 @@ export async function POST(request: Request) {
             phoneNumberToUnsubscribe
           );
           if (unsubscribed === false) {
-            await twilio.sendText(messageData.From, `*הוסרתם בצלחה*`);
+            twilioResult = await twilio.sendText(
+              messageData.From,
+              `*הוסרתם בצלחה*`
+            );
           } else {
-            await twilio.sendText(
+            twilioResult = await twilio.sendText(
               `${messageData.From}`,
               `*ישנה תקלה בהסרה, אנא צרו איתנו קשר במייל* info@ci-events.org`
             );
           }
           break;
         case "confirm_remove_no":
-          await twilio.sendTemplate(
+          twilioResult = await twilio.sendTemplate(
             messageData.From,
             process.env.TWILIO_TEMPLATE_FIRST_MESSAGE!
           );
@@ -217,12 +231,12 @@ export async function POST(request: Request) {
             (r) => r.value === region
           )?.label;
           const jamesTitle = `*ג׳אמים ושיעורים ב${regionHebrew} בשבוע הקרוב*`;
-          await twilio.sendText(
+          twilioResult = await twilio.sendText(
             messageData.From,
             jamesTitle + "\n\n" + formattedEvents
           );
         } else {
-          await twilio.sendText(
+          twilioResult = await twilio.sendText(
             messageData.From,
             emptyRegionMessage(region as Region)
           );
@@ -254,6 +268,10 @@ export async function POST(request: Request) {
         status: "error",
         message: "Failed to process webhook",
       });
+    }
+
+    if (twilioResult) {
+      await supabase.logTwilioResult(twilioResult, message.id, user.id);
     }
 
     return NextResponse.json({ status: "success" });
