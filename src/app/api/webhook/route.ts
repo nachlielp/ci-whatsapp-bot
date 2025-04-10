@@ -94,7 +94,7 @@ export async function POST(request: Request) {
           const { user: weeklyScheduleUser, events: weeklyScheduleEvents } =
             userAndWeeklyEvents;
 
-          if (weeklyScheduleUser?.filter.length === 0) {
+          if (!weeklyScheduleUser || weeklyScheduleUser.filter.length === 0) {
             const noWeeklyFilterMessageTitle = `*לא מוגדר לכם איזורים *`;
             await twilio.sendText(
               messageData.From,
@@ -131,7 +131,7 @@ export async function POST(request: Request) {
           const { user: weekendScheduleUser, events: weekendScheduleEvents } =
             userAndWeekendEvents;
 
-          if (weekendScheduleUser?.filter.length === 0) {
+          if (!weekendScheduleUser || weekendScheduleUser.filter.length === 0) {
             const noWeeklyFilterMessageTitle = `*לא מוגדר לכם איזורים *`;
             await twilio.sendText(
               messageData.From,
