@@ -93,6 +93,15 @@ export async function POST(request: Request) {
           }
           const { user: weeklyScheduleUser, events: weeklyScheduleEvents } =
             userAndWeeklyEvents;
+
+          if (weeklyScheduleUser?.filter.length === 0) {
+            const noWeeklyFilterMessageTitle = `*לא מוגדר לכם איזורים *`;
+            await twilio.sendText(
+              messageData.From,
+              noWeeklyFilterMessageTitle + "\n\n" + setupWeeklyMessage()
+            );
+            break;
+          }
           const weeklyScheduleTitle = `*אירועים בשבוע הקרוב ב${weeklyScheduleUser?.filter
             .map(
               (r: Region) => districtOptions.find((d) => d.value === r)?.label
@@ -121,6 +130,16 @@ export async function POST(request: Request) {
           }
           const { user: weekendScheduleUser, events: weekendScheduleEvents } =
             userAndWeekendEvents;
+
+          if (weekendScheduleUser?.filter.length === 0) {
+            const noWeeklyFilterMessageTitle = `*לא מוגדר לכם איזורים *`;
+            await twilio.sendText(
+              messageData.From,
+              noWeeklyFilterMessageTitle + "\n\n" + setupWeeklyMessage()
+            );
+            break;
+          }
+
           const weekendScheduleTitle = `*אירועים בסופ״ש הקרוב ב${weekendScheduleUser?.filter
             .map(
               (r: Region) => districtOptions.find((d) => d.value === r)?.label
