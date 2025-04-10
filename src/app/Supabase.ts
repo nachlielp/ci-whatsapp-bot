@@ -311,13 +311,18 @@ class Supabase {
   async logTwilioResult(
     twilioResult: object,
     messageId: string,
-    userId: string
+    userId: string,
+    from: string,
+    to: string
   ) {
     try {
       const result = await this.supabase.from("wa_twilio_logs").insert({
         result: twilioResult,
         wa_users_id: userId,
         wa_messages_id: messageId,
+        trigger: "user_message",
+        from: from,
+        to: to,
       });
       return result.data;
     } catch (e) {

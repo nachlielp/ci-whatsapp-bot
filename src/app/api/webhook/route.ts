@@ -271,7 +271,13 @@ export async function POST(request: Request) {
     }
 
     if (twilioResult) {
-      await supabase.logTwilioResult(twilioResult, message.id, user.id);
+      await supabase.logTwilioResult(
+        twilioResult,
+        message.id,
+        user.id,
+        process.env.TWILIO_PHONE_NUMBER!,
+        user.phone
+      );
     }
 
     return NextResponse.json({ status: "success" });
