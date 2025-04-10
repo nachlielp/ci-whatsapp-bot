@@ -10,7 +10,8 @@ import {
   formatSubscribedRegions,
   filterEventsByRegions,
 } from "@/util/utilService";
-
+import dotenv from "dotenv";
+dotenv.config();
 export async function POST(request: Request) {
   const startTime = Date.now(); // Capture start time
   let twilioResult;
