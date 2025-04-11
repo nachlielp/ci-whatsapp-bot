@@ -1,9 +1,4 @@
-import {
-  CIEventList,
-  districtOptions,
-  EventlyType,
-  Region,
-} from "@/app/api/interface";
+import { CIEventList, districtOptions, EventlyType, Region } from "@/interface";
 import dayjs from "dayjs";
 import "dayjs/locale/he";
 

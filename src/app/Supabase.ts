@@ -2,7 +2,7 @@ import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import dotenv from "dotenv";
 import { tryCatch } from "@/util/tryCatch";
 import dayjs from "dayjs";
-import { CIEventList, WAMessage, WAUser, Region } from "./api/interface";
+import { CIEventList, WAMessage, WAUser, Region } from "../interface";
 import { getWeeklyFilterFromBody } from "@/util/utilService";
 dotenv.config();
 

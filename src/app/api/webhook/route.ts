@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabase } from "../../Supabase";
 import { twilio } from "@/app/Twilio";
-import { EventlyType, Region, districtOptions } from "../interface";
+import { EventlyType, Region, districtOptions } from "../../../interface";
 import {
   filterCIEventsByType,
   formatCIEventsList,
