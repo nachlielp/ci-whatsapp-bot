@@ -32,11 +32,13 @@ export async function POST(request: Request) {
         "true" &&
       !messageData.WaId.startsWith("972")
     ) {
+      console.log("blocking international messages for", messageData.WaId);
       return NextResponse.json({ status: "blocked" });
     }
 
     //Block blocked users
     if (process.env.BLOCK_BLOCKED_USERS?.toLowerCase().trim() === "true") {
+      console.log("checking blocked users for", messageData.WaId);
       const user = await supabase.getUser(messageData.WaId);
       if (user?.is_blocked) {
         return NextResponse.json({ status: "blocked" });
