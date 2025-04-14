@@ -27,15 +27,16 @@ export async function POST(request: Request) {
     });
 
     //Blcok international
-    if (process.env.BLOCK_INTERNATIONAL_MESSAGES === "true") {
-      if (!messageData.From.includes("+972")) {
-        await supabase.upsertUser({
-          name: messageData.ProfileName,
-          phoneNumber: messageData.WaId,
-          is_blocked: true,
-        });
-        return NextResponse.json({ status: "blocked" });
-      }
+    if (
+      process.env.BLOCK_INTERNATIONAL_MESSAGES === "true" &&
+      !messageData.WaId.startsWith("972")
+    ) {
+      await supabase.upsertUser({
+        name: messageData.ProfileName,
+        phoneNumber: messageData.WaId,
+        is_blocked: true,
+      });
+      return NextResponse.json({ status: "blocked" });
     }
 
     //Block blocked users
