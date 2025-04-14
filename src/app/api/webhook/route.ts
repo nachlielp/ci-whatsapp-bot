@@ -39,7 +39,8 @@ export async function POST(request: Request) {
     );
 
     if (
-      process.env.BLOCK_INTERNATIONAL_MESSAGES === "true" &&
+      process.env.BLOCK_INTERNATIONAL_MESSAGES?.toLowerCase().trim() ===
+        "true" &&
       !messageData.WaId.startsWith("972")
     ) {
       console.log("__blocked__");
