@@ -34,6 +34,7 @@ export async function POST(request: Request) {
           phoneNumber: messageData.WaId,
           is_blocked: true,
         });
+        return NextResponse.json({ status: "blocked" });
       }
     }
 
