@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { twilio } from "@/app/Twilio";
-import { supabase } from "@/app/Supabase";
+// import { twilio } from "@/app/Twilio";
+// import { supabase } from "@/app/Supabase";
 // import { districtOptions } from "../interface";
 import dotenv from "dotenv";
 dotenv.config();
@@ -22,10 +22,10 @@ export async function GET() {
   // );
   // console.log("res", res);
 
-  const phoneNumber = "whatsapp:+972584994306";
-  const var1 = "נחליאל";
-  const var2 = "ירושלים, מרכז";
-  const var3 = "7";
+  // const phoneNumber = "whatsapp:+972584994306";
+  // const var1 = "נחליאל";
+  // const var2 = "ירושלים, מרכז";
+  // const var3 = "7";
 
   // const user = await supabase.upsertUser({
   //   name: "nachliel",
