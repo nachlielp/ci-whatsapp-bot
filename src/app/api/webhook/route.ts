@@ -27,6 +27,16 @@ export async function POST(request: Request) {
     });
 
     //Blcok international
+
+    console.log("messageData.WaId", messageData.WaId);
+    console.log(
+      "messageData.WaId.startsWith('972')",
+      messageData.WaId.startsWith("972")
+    );
+    console.log(
+      "process.env.BLOCK_INTERNATIONAL_MESSAGES",
+      process.env.BLOCK_INTERNATIONAL_MESSAGES
+    );
     if (
       process.env.BLOCK_INTERNATIONAL_MESSAGES === "true" &&
       !messageData.WaId.startsWith("972")
