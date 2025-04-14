@@ -36,11 +36,11 @@ export async function GET() {
   //   await supabase.incrementMessageCount(phoneNumber, +user.message_count);
   // }
 
-  const time = new Date();
-  const blockedUsers = await supabase.listOfBlockedUsers();
-  const time2 = new Date();
-  console.log("time2", time2.getTime() - time.getTime());
-  const timetoprocess = time2.getTime() - time.getTime();
+  // const time = new Date();
+  // const blockedUsers = await supabase.listOfBlockedUsers();
+  // const time2 = new Date();
+  // console.log("time2", time2.getTime() - time.getTime());
+  // const timetoprocess = time2.getTime() - time.getTime();
   // const res = await twilio.sendTemplate(
   //   `${phoneNumber}`,
   //   "HX22e0f3f6bb9efabb9bffc8e51d3a717f",
@@ -60,5 +60,5 @@ export async function GET() {
   //   );
   // }
   // throw new Error("test error blabla");
-  return NextResponse.json({ blockedUsers, timetoprocess });
+  return NextResponse.json({});
 }
