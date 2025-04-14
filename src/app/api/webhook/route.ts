@@ -31,11 +31,6 @@ export async function POST(request: Request) {
       process.env.BLOCK_INTERNATIONAL_MESSAGES === "true" &&
       !messageData.WaId.startsWith("972")
     ) {
-      await supabase.upsertUser({
-        name: messageData.ProfileName,
-        phoneNumber: messageData.WaId,
-        is_blocked: true,
-      });
       return NextResponse.json({ status: "blocked" });
     }
 
