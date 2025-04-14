@@ -54,9 +54,11 @@ class Supabase {
   async upsertUser({
     name,
     phoneNumber,
+    is_blocked = false,
   }: {
     name: string;
     phoneNumber: string;
+    is_blocked?: boolean;
   }): Promise<WAUser> {
     try {
       const result = await this.supabase
@@ -65,6 +67,7 @@ class Supabase {
           {
             name,
             phone: phoneNumber,
+            is_blocked,
           },
           {
             onConflict: "phone",
@@ -80,6 +83,7 @@ class Supabase {
       throw error;
     }
   }
+
   async createUser({
     name,
     phoneNumber,
@@ -102,6 +106,38 @@ class Supabase {
       console.error("Error creating user:", error);
       throw error;
     }
+  }
+
+  async getUser(phoneNumber: string) {
+    try {
+      const result = await this.supabase
+        .from("wa_users")
+        .select("*")
+        .eq("phone", phoneNumber)
+        .single();
+      return result.data as WAUser;
+    } catch (error) {
+      console.error("Error getting user:", error);
+      return null;
+    }
+  }
+
+  async incrementMessageCount(
+    phoneNumber: string,
+    currentMessageCount: number
+  ) {
+    let result = null;
+    try {
+      result = await this.supabase
+        .from("wa_users")
+        .update({ message_count: currentMessageCount + 1 })
+        .eq("phone", phoneNumber);
+    } catch (error) {
+      console.error("Error incrementing message count:", error);
+      throw error;
+    }
+
+    return result;
   }
 
   async getUserByPhoneNumber(phoneNumber: string) {
@@ -328,6 +364,19 @@ class Supabase {
     } catch (e) {
       console.error("Error logging twilio result:", e);
       throw new Error("Error logging twilio result");
+    }
+  }
+
+  async getBlockedUsers() {
+    try {
+      const result = await this.supabase
+        .from("wa_users")
+        .select("*")
+        .eq("is_blocked", true);
+      return result.data;
+    } catch (e) {
+      console.error("Error getting blocked users:", e);
+      return [];
     }
   }
 }

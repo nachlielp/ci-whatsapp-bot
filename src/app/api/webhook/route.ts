@@ -26,6 +26,25 @@ export async function POST(request: Request) {
       messageData[key] = value.toString();
     });
 
+    //Blcok international
+    if (process.env.BLOCK_INTERNATIONAL_MESSAGES === "true") {
+      if (!messageData.From.includes("+972")) {
+        await supabase.upsertUser({
+          name: messageData.ProfileName,
+          phoneNumber: messageData.WaId,
+          is_blocked: true,
+        });
+      }
+    }
+
+    //Block blocked users
+    if (process.env.BLOCK_BLOCKED_USERS === "true") {
+      const user = await supabase.getUser(messageData.WaId);
+      if (user?.is_blocked) {
+        return NextResponse.json({ status: "blocked" });
+      }
+    }
+
     if (messageData.MessageType === "text") {
       if (messageData.Body.includes("הסר")) {
         twilioResult = await twilio.sendTemplate(
@@ -253,6 +272,13 @@ export async function POST(request: Request) {
       name: messageData.ProfileName,
       phoneNumber: messageData.WaId,
     });
+
+    if (user) {
+      await supabase.incrementMessageCount(
+        messageData.WaId,
+        +user.message_count
+      );
+    }
 
     const message = await supabase.receiveMessage({
       blob: messageData,

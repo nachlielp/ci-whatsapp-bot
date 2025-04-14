@@ -109,4 +109,7 @@ export interface WAUser {
   created_at: string;
   id: string;
   filter: Region[];
+  message_count: number;
+  received_block_notice: boolean;
+  is_blocked: boolean;
 }
