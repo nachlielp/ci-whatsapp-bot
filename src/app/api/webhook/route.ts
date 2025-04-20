@@ -242,6 +242,7 @@ export async function POST(request: Request) {
         const filteredEvents = filterCIEventsByType(ci_events, [
           EventlyType.class,
           EventlyType.jame,
+          EventlyType.jam,
           EventlyType.underscore,
           EventlyType.score,
         ]);

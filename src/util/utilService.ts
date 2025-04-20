@@ -12,6 +12,7 @@ export function filterJamsAndClasses(events: CIEventList[]) {
   const eventTypes = [
     EventlyType.class,
     EventlyType.jame,
+    EventlyType.jam, //handle old spelling mistake
     EventlyType.underscore,
     EventlyType.score,
   ];

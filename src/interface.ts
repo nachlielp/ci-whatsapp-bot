@@ -43,6 +43,7 @@ export interface CIEventList {
 export enum EventlyType {
   class = "class",
   jame = "jame",
+  jam = "jam", //handle old spelling mistake
   workshop = "workshop",
   conference = "conference",
   underscore = "underscore",
