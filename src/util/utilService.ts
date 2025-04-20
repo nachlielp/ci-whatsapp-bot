@@ -103,15 +103,6 @@ export function formatCIEventsList(events: CIEventList[]) {
     .join("\n\n");
 }
 
-function hebrewDate(date: string) {
-  return (
-    dayjs(date).locale("he").format("dddd, D") +
-    " ב" +
-    dayjs(date).locale("he").format(" MMMM") +
-    "\n"
-  );
-}
-
 function formatTime(event: CIEventList) {
   if (!event.is_multi_day) {
     return `${dayjs(event.segments[event.segments.length - 1].startTime)
