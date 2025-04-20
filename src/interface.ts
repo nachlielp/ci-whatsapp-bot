@@ -113,4 +113,5 @@ export interface WAUser {
   message_count: number;
   received_block_notice: boolean;
   is_blocked: boolean;
+  updated_at: string;
 }

@@ -130,7 +130,10 @@ class Supabase {
     try {
       result = await this.supabase
         .from("wa_users")
-        .update({ message_count: currentMessageCount + 1 })
+        .update({
+          message_count: currentMessageCount + 1,
+          updated_at: dayjs().tz("UTC").format("YYYY-MM-DD HH:mm:ss.SSSSSSZ"),
+        })
         .eq("phone", phoneNumber);
     } catch (error) {
       console.error("Error incrementing message count:", error);
