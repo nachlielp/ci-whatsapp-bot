@@ -93,9 +93,9 @@ export function formatCIEventsList(events: CIEventList[]) {
       const eventsText = dayEvents
         .map(
           (event) =>
-            `*${event.title.trim()}*\n${formatTime(event)}${
-              event.address.label
-            }\n${formatEventUrl(event)}`
+            `*${event.title.trim()}*\n${formatSingleDayTimeOrMultiDayDates(
+              event
+            )}${event.address.label}\n${formatEventUrl(event)}`
         )
         .join("\n\n");
       return `${dateTitle}${eventsText}`;
@@ -103,7 +103,7 @@ export function formatCIEventsList(events: CIEventList[]) {
     .join("\n\n");
 }
 
-function formatTime(event: CIEventList) {
+function formatSingleDayTimeOrMultiDayDates(event: CIEventList) {
   if (!event.is_multi_day) {
     return `${dayjs(event.segments[event.segments.length - 1].startTime)
       .tz()
@@ -111,7 +111,11 @@ function formatTime(event: CIEventList) {
       .tz()
       .format("HH:mm")} \n`;
   } else {
-    return "";
+    return `${dayjs(event.start_date).tz().format("DD/MM")} - ${dayjs(
+      event.end_date
+    )
+      .tz()
+      .format("DD/MM")} \n`;
   }
 }
 

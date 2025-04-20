@@ -33,6 +33,7 @@ export interface UserOption {
 export interface CIEventList {
   title: string;
   start_date: string;
+  end_date: string;
   district: Region;
   short_id: string;
   segments: CIEventSegments[];
