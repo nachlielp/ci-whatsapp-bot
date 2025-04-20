@@ -59,6 +59,7 @@ export enum Region {
   haifa = "haifa",
   carmel = "carmel",
   pardesHanna = "pardesHanna",
+  pardesHana = "pardes-hana", //handle old spelling mistake
   south = "south",
   north = "north",
 }

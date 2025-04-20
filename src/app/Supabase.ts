@@ -163,8 +163,14 @@ class Supabase {
     toDate: string = dayjs().add(7, "day").format("YYYY-MM-DD")
   ) {
     let districts = [];
-    if (region === "north") {
-      districts = ["haifa", "pardesHanna", "carmel", "galilee"];
+    if (region === Region.north) {
+      districts = [
+        Region.haifa,
+        Region.pardesHanna,
+        Region.pardesHana,
+        Region.carmel,
+        Region.galilee,
+      ];
     } else {
       districts = [region];
     }
