@@ -1,6 +1,15 @@
 import { CIEventList, districtOptions, EventlyType, Region } from "@/interface";
 import dayjs from "dayjs";
 import "dayjs/locale/he";
+import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
+
+// Initialize plugins
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+// Set default timezone to Israel
+dayjs.tz.setDefault("Asia/Jerusalem");
 
 export function filterEventsByRegions(
   events: CIEventList[],
