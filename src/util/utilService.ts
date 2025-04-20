@@ -97,9 +97,11 @@ function hebrewDate(date: string) {
 
 function formatTime(event: CIEventList) {
   if (!event.is_multi_day) {
-    return `${dayjs(event.segments[event.segments.length - 1].startTime).format(
-      "HH:mm"
-    )} - ${dayjs(event.segments[0].endTime).format("HH:mm")} \n`;
+    return `${dayjs(event.segments[event.segments.length - 1].startTime)
+      .tz()
+      .format("HH:mm")} - ${dayjs(event.segments[0].endTime)
+      .tz()
+      .format("HH:mm")} \n`;
   }
 }
 
