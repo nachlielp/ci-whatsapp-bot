@@ -134,7 +134,7 @@ export async function POST(request: Request) {
             .map(
               (r: Region) => districtOptions.find((d) => d.value === r)?.label
             )
-            .join(", ")}*`;
+            .join(", ")}.*`;
 
           const weeklyScheduleFilteredEvents = filterEventsByRegions(
             weeklyScheduleEvents,

@@ -73,16 +73,33 @@ export function filterCIEventsByType(
 }
 
 export function formatCIEventsList(events: CIEventList[]) {
-  return events
-    .sort((a, b) => dayjs(a.start_date).diff(dayjs(b.start_date)))
-    .map(
-      (event) =>
-        `*${event.title.trim()}* \n יום ${hebrewDate(
-          event.start_date
-        )} ${formatTime(event)} ${event.address.label} \n  ${formatEventUrl(
-          event
-        )}`
-    )
+  // First sort events by date
+  const sortedEvents = events.sort((a, b) =>
+    dayjs(a.start_date).diff(dayjs(b.start_date))
+  );
+
+  const eventsByDate = sortedEvents.reduce((groups, event) => {
+    const date = dayjs(event.start_date).format("YYYY-MM-DD");
+    if (!groups[date]) {
+      groups[date] = [];
+    }
+    groups[date].push(event);
+    return groups;
+  }, {} as Record<string, CIEventList[]>);
+
+  return Object.entries(eventsByDate)
+    .map(([date, dayEvents]) => {
+      const dateTitle = `~ ~ *${hebrewDay(date).trim()}* ~ ~ \n`;
+      const eventsText = dayEvents
+        .map(
+          (event) =>
+            `*${event.title.trim()}*\n${formatTime(event)}${
+              event.address.label
+            }\n${formatEventUrl(event)}`
+        )
+        .join("\n\n");
+      return `${dateTitle}${eventsText}`;
+    })
     .join("\n\n");
 }
 
@@ -102,6 +119,8 @@ function formatTime(event: CIEventList) {
       .format("HH:mm")} - ${dayjs(event.segments[0].endTime)
       .tz()
       .format("HH:mm")} \n`;
+  } else {
+    return "";
   }
 }
 
@@ -151,4 +170,15 @@ export function formatSubscribedRegions(regions: Region[]) {
   return `*נרשמתם בהצלחה לקבל עדכון שבועי על אירועים באיזורים הבאים: ${regionHebrew}*
 
 להסרה שילחו הודעה עם המילה *הסר*`;
+}
+
+function hebrewDay(date: string) {
+  return (
+    "יום " +
+    dayjs(date).locale("he").format("dddd") +
+    ", " +
+    dayjs(date).locale("he").format("D") +
+    " ב" +
+    dayjs(date).locale("he").format("MMMM")
+  );
 }
