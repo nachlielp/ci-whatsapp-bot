@@ -68,9 +68,11 @@ export function formatCIEventsList(events: CIEventList[]) {
     .sort((a, b) => dayjs(a.start_date).diff(dayjs(b.start_date)))
     .map(
       (event) =>
-        `*${event.title}* \n יום ${hebrewDate(event.start_date)} ${formatTime(
+        `*${event.title.trim()}* \n יום ${hebrewDate(
+          event.start_date
+        )} ${formatTime(event)} ${event.address.label} \n  ${formatEventUrl(
           event
-        )} ${event.address.label} \n  ${formatEventUrl(event)}`
+        )}`
     )
     .join("\n\n");
 }
