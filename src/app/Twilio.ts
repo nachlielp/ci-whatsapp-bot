@@ -64,6 +64,7 @@ class Twilio {
   }
 
   async validateTwilioRequest(request: Request) {
+    console.log("Validating Twilio request");
     const twilioSignature = request.headers.get("x-twilio-signature");
     const url = process.env.WEBHOOK_URL;
     const authToken = process.env.TWILIO_AUTH_TOKEN;
@@ -93,6 +94,8 @@ class Twilio {
           "Invalid Twilio signature for request: \n" + twilioRequestBody
         );
       }
+
+      console.log("Twilio request validated");
 
       return isValid;
     } catch (error) {
