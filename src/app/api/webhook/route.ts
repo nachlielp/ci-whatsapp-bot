@@ -16,15 +16,14 @@ export async function POST(request: Request) {
   const startTime = Date.now(); // Capture start time
   let twilioResult;
 
-  const isValid = await twilio.validateTwilioRequest(request);
-
-  if (!isValid) {
-    // throw new Error(`Invalid request ${JSON.stringify(request)}`);
-    console.log("api/webhook/route.ts: Invalid request", request);
-  }
   try {
     const formData = await request.formData();
+    const isValid = await twilio.validateTwilioRequest(request, formData);
 
+    if (!isValid) {
+      // throw new Error(`Invalid request ${JSON.stringify(request)}`);
+      console.log("api/webhook/route.ts: Invalid request", request);
+    }
     // Convert FormData to a regular object
     const messageData: Record<string, string> = {};
     formData.forEach((value, key) => {

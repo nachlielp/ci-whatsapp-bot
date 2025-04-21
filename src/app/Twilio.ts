@@ -63,7 +63,7 @@ class Twilio {
     return result.data;
   }
 
-  async validateTwilioRequest(request: Request) {
+  async validateTwilioRequest(request: Request, formData: FormData) {
     try {
       console.log("Twilio.ts: Validating Twilio request");
 
@@ -92,15 +92,6 @@ class Twilio {
         console.log(
           "Twilio.ts: TWILIO_AUTH_TOKEN environment variable is not set"
         );
-        return false;
-      }
-
-      // Safely get form data
-      let formData;
-      try {
-        formData = await request.formData();
-      } catch (formError) {
-        console.log("Twilio.ts: Failed to parse form data:", formError);
         return false;
       }
 
