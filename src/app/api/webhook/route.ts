@@ -13,7 +13,6 @@ import {
 import dotenv from "dotenv";
 dotenv.config();
 export async function POST(request: Request) {
-  console.log(request);
   const startTime = Date.now(); // Capture start time
   let twilioResult;
 
