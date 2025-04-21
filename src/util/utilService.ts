@@ -1,4 +1,10 @@
-import { CIEventList, districtOptions, EventlyType, Region } from "@/interface";
+import {
+  CIEventList,
+  districtOptions,
+  EventlyType,
+  Region,
+  TwilioWhatsappWebhookPayload,
+} from "@/interface";
 import dayjs from "dayjs";
 import "dayjs/locale/he";
 import timezone from "dayjs/plugin/timezone";
@@ -176,4 +182,29 @@ function hebrewDay(date: string) {
     " ב" +
     dayjs(date).locale("he").format("MMMM")
   );
+}
+
+export function validateTwilioPayload(payload: Record<string, string>) {
+  try {
+    const requiredFields = Object.keys(
+      payload
+    ) as (keyof TwilioWhatsappWebhookPayload)[];
+
+    const missingFields = requiredFields.filter((field) => !(field in payload));
+    const invalidFields = requiredFields.filter((field) => !(field in payload));
+
+    if (missingFields.length > 0) {
+      throw new Error(
+        `Invalid Twilio webhook payload: Missing required fields: ${missingFields.join(
+          ", "
+        )} ${
+          invalidFields.length > 0
+            ? `|||  Invalid fields: ${invalidFields.join(", ")}`
+            : ""
+        }`
+      );
+    }
+  } catch (e) {
+    console.error("Error validating Twilio payload:", e);
+  }
 }

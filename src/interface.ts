@@ -117,3 +117,26 @@ export interface WAUser {
   is_blocked: boolean;
   updated_at: string;
 }
+
+export interface TwilioWhatsappWebhookPayload {
+  To: string;
+  Body: string;
+  From: string;
+  WaId: string;
+  SmsSid: string;
+  NumMedia: string;
+  SmsStatus: string;
+  AccountSid: string;
+  ApiVersion: string;
+  ButtonText: string;
+  MessageSid: string;
+  MessageType: string;
+  NumSegments: string;
+  ProfileName: string;
+  ButtonPayload: string;
+  SmsMessageSid: string;
+  ReferralNumMedia: string;
+  MessagingServiceSid: string;
+  OriginalRepliedMessageSid: string;
+  OriginalRepliedMessageSender: string;
+}

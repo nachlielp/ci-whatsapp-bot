@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 import { Twilio as TwilioClient } from "twilio";
 import type { MessageInstance } from "twilio/lib/rest/api/v2010/account/message";
 import { tryCatch } from "@/util/tryCatch";
+import { validateRequest } from "twilio/lib/webhooks/webhooks";
 dotenv.config();
 
 class Twilio {
@@ -60,6 +61,43 @@ class Twilio {
     }
 
     return result.data;
+  }
+
+  async validateTwilioRequest(request: Request) {
+    const twilioSignature = request.headers.get("x-twilio-signature");
+    const url = process.env.WEBHOOK_URL;
+    const authToken = process.env.TWILIO_AUTH_TOKEN;
+
+    // Validate required parameters
+    if (!twilioSignature) {
+      throw new Error("No Twilio signature found in request headers");
+    }
+    if (!url) {
+      throw new Error("WEBHOOK_URL environment variable is not set");
+    }
+    if (!authToken) {
+      throw new Error("TWILIO_AUTH_TOKEN environment variable is not set");
+    }
+
+    try {
+      const twilioRequestBody = await request.text();
+      const isValid = validateRequest(
+        authToken,
+        twilioSignature,
+        url,
+        JSON.parse(twilioRequestBody)
+      );
+
+      if (!isValid) {
+        throw new Error(
+          "Invalid Twilio signature for request: \n" + twilioRequestBody
+        );
+      }
+
+      return isValid;
+    } catch (error) {
+      throw new Error(`Failed to validate Twilio request: ${error}`);
+    }
   }
 }
 

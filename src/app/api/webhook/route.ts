@@ -16,6 +16,12 @@ export async function POST(request: Request) {
   const startTime = Date.now(); // Capture start time
   let twilioResult;
 
+  const isValid = await twilio.validateTwilioRequest(request);
+
+  if (!isValid) {
+    throw new Error(`Invalid request ${JSON.stringify(request)}`);
+  }
+
   try {
     // Parse the request body
     const formData = await request.formData();
