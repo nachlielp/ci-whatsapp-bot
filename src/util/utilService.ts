@@ -134,18 +134,6 @@ export function emptyRegionMessage(region: Region) {
   return `*אין במערכת אירועים השבוע ב${regionHebrew}*`;
 }
 
-export function setupWeeklyMessage() {
-  return `על מנת להגדיר את הפילטר, שילחו *הודעה אחת* עם המילה *שבועי* והמספרים של האזורים בהם אתם מעוניינים.
-1 - ירושלים
-2 - מרכז
-3 - צפון
-4 - דרום
-
-לדוגמה עבור ירושלים ומרכז שילחו:
-שבועי 1 2 
-`;
-}
-
 export function getWeeklyFilterFromBody(body: string) {
   const weeklyFilter: Region[] = [];
   if (body.includes("1")) {
@@ -191,20 +179,17 @@ export function validateTwilioPayload(payload: Record<string, string>) {
     ) as (keyof TwilioWhatsappWebhookPayload)[];
 
     const missingFields = requiredFields.filter((field) => !(field in payload));
-    const invalidFields = requiredFields.filter((field) => !(field in payload));
 
     if (missingFields.length > 0) {
       throw new Error(
         `Invalid Twilio webhook payload: Missing required fields: ${missingFields.join(
           ", "
-        )} ${
-          invalidFields.length > 0
-            ? `|||  Invalid fields: ${invalidFields.join(", ")}`
-            : ""
-        }`
+        )}`
       );
     }
+    return true;
   } catch (e) {
     console.error("Error validating Twilio payload:", e);
+    return false;
   }
 }

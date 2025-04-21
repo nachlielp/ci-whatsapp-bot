@@ -23,6 +23,7 @@ class Twilio {
   }
 
   async sendText(to: string, body: string): Promise<MessageInstance> {
+    //TODO varify that body is not empty or over the limit (1600 characters?)
     const result = await tryCatch(
       this.client.messages.create({
         from: `whatsapp:${this.fromNumber}`,
@@ -63,7 +64,10 @@ class Twilio {
     return result.data;
   }
 
-  async validateTwilioRequest(request: Request, formData: FormData) {
+  async validateTwilioRequest(
+    request: Request,
+    messageData: Record<string, string>
+  ) {
     try {
       console.log("Twilio.ts: Validating Twilio request");
 
@@ -95,24 +99,10 @@ class Twilio {
         return false;
       }
 
-      // Convert FormData to a plain object with error handling
-      const params: Record<string, string> = {};
-      try {
-        formData.forEach((value, key) => {
-          params[key] = String(value);
-        });
-      } catch (conversionError) {
-        console.log(
-          "Twilio.ts: Failed to convert form data to params:",
-          conversionError
-        );
-        return false;
-      }
-
       // Safely validate the request
       let isValid = false;
       try {
-        isValid = validateRequest(authToken, twilioSignature, url, params);
+        isValid = validateRequest(authToken, twilioSignature, url, messageData);
       } catch (validationError) {
         console.log(
           "Twilio.ts: Error during Twilio validation:",

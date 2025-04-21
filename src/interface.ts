@@ -97,7 +97,7 @@ export enum EventListType {
 }
 export interface WAMessage {
   id: string;
-  blob: Record<string, unknown>;
+  blob: TwilioWhatsappWebhookPayload;
   WaId: string;
   ProfileName: string;
   Body: string;
@@ -133,10 +133,37 @@ export interface TwilioWhatsappWebhookPayload {
   MessageType: string;
   NumSegments: string;
   ProfileName: string;
-  ButtonPayload: string;
+  ButtonPayload?: string;
+  ListId?: string;
   SmsMessageSid: string;
   ReferralNumMedia: string;
   MessagingServiceSid: string;
   OriginalRepliedMessageSid: string;
   OriginalRepliedMessageSender: string;
+}
+
+export enum MessageType {
+  text = "text",
+  button = "button",
+  interactive = "interactive",
+}
+
+export enum InteractiveButtonPayload {
+  first_message_reminder = "first_message_reminder",
+  first_message_events = "first_message_events",
+  event_types_james = "event_types_james",
+  event_types_courses = "event_types_courses",
+  set_weekly_filter = "set_weekly_filter",
+  weekly_schedule_events = "weekly_schedule_events",
+  weekend_schedule_events = "weekend_schedule_events",
+  remove_weekly_filter = "remove_weekly_filter",
+  confirm_remove_yes = "confirm_remove_yes",
+  confirm_remove_no = "confirm_remove_no",
+}
+
+export enum SelectRegionListId {
+  select_regions_jerusalem = "select_regions_jerusalem",
+  select_regions_center = "select_regions_center",
+  select_regions_south = "select_regions_south",
+  select_regions_north = "select_regions_north",
 }
