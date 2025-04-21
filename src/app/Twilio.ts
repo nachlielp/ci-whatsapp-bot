@@ -64,20 +64,28 @@ class Twilio {
   }
 
   async validateTwilioRequest(request: Request) {
-    console.log("Validating Twilio request");
+    console.log("Twilio.ts: Validating Twilio request");
     const twilioSignature = request.headers.get("x-twilio-signature");
     const url = process.env.WEBHOOK_URL;
     const authToken = process.env.TWILIO_AUTH_TOKEN;
 
     // Validate required parameters
     if (!twilioSignature) {
-      throw new Error("No Twilio signature found in request headers");
+      // throw new Error("No Twilio signature found in request headers");
+      console.log("Twilio.ts: No Twilio signature found in request headers");
+      return false;
     }
     if (!url) {
-      throw new Error("WEBHOOK_URL environment variable is not set");
+      // throw new Error("WEBHOOK_URL environment variable is not set");
+      console.log("Twilio.ts: WEBHOOK_URL environment variable is not set");
+      return false;
     }
     if (!authToken) {
-      throw new Error("TWILIO_AUTH_TOKEN environment variable is not set");
+      // throw new Error("TWILIO_AUTH_TOKEN environment variable is not set");
+      console.log(
+        "Twilio.ts: TWILIO_AUTH_TOKEN environment variable is not set"
+      );
+      return false;
     }
 
     try {
@@ -95,11 +103,13 @@ class Twilio {
         );
       }
 
-      console.log("Twilio request validated");
+      console.log("Twilio.ts: Twilio request validated");
 
       return isValid;
     } catch (error) {
-      throw new Error(`Failed to validate Twilio request: ${error}`);
+      console.log("Twilio.ts: Failed to validate Twilio request: ", error);
+      return false;
+      // throw new Error(`Failed to validate Twilio request: ${error}`);
     }
   }
 }

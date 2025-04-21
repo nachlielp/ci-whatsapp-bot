@@ -19,9 +19,9 @@ export async function POST(request: Request) {
   const isValid = await twilio.validateTwilioRequest(request);
 
   if (!isValid) {
-    throw new Error(`Invalid request ${JSON.stringify(request)}`);
+    // throw new Error(`Invalid request ${JSON.stringify(request)}`);
+    console.log("api/webhook/route.ts: Invalid request", request);
   }
-
   try {
     // Parse the request body
     const formData = await request.formData();
