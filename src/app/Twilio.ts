@@ -64,52 +64,86 @@ class Twilio {
   }
 
   async validateTwilioRequest(request: Request) {
-    console.log("Twilio.ts: Validating Twilio request");
-    const twilioSignature = request.headers.get("x-twilio-signature");
-    const url = process.env.WEBHOOK_URL;
-    const authToken = process.env.TWILIO_AUTH_TOKEN;
-
-    // Validate required parameters
-    if (!twilioSignature) {
-      // throw new Error("No Twilio signature found in request headers");
-      console.log("Twilio.ts: No Twilio signature found in request headers");
-      return false;
-    }
-    if (!url) {
-      // throw new Error("WEBHOOK_URL environment variable is not set");
-      console.log("Twilio.ts: WEBHOOK_URL environment variable is not set");
-      return false;
-    }
-    if (!authToken) {
-      // throw new Error("TWILIO_AUTH_TOKEN environment variable is not set");
-      console.log(
-        "Twilio.ts: TWILIO_AUTH_TOKEN environment variable is not set"
-      );
-      return false;
-    }
-
     try {
-      const twilioRequestBody = await request.text();
-      const isValid = validateRequest(
-        authToken,
-        twilioSignature,
-        url,
-        JSON.parse(twilioRequestBody)
-      );
+      console.log("Twilio.ts: Validating Twilio request");
+
+      // Safely check if request is valid
+      if (!request || typeof request !== "object") {
+        console.log("Twilio.ts: Invalid request object");
+        return false;
+      }
+
+      // Safely get headers
+      const twilioSignature =
+        request.headers?.get("x-twilio-signature") || null;
+      const url = process.env.WEBHOOK_URL;
+      const authToken = process.env.TWILIO_AUTH_TOKEN;
+
+      // Validate required parameters
+      if (!twilioSignature) {
+        console.log("Twilio.ts: No Twilio signature found in request headers");
+        return false;
+      }
+      if (!url) {
+        console.log("Twilio.ts: WEBHOOK_URL environment variable is not set");
+        return false;
+      }
+      if (!authToken) {
+        console.log(
+          "Twilio.ts: TWILIO_AUTH_TOKEN environment variable is not set"
+        );
+        return false;
+      }
+
+      // Safely get form data
+      let formData;
+      try {
+        formData = await request.formData();
+      } catch (formError) {
+        console.log("Twilio.ts: Failed to parse form data:", formError);
+        return false;
+      }
+
+      // Convert FormData to a plain object with error handling
+      const params: Record<string, string> = {};
+      try {
+        formData.forEach((value, key) => {
+          params[key] = String(value);
+        });
+      } catch (conversionError) {
+        console.log(
+          "Twilio.ts: Failed to convert form data to params:",
+          conversionError
+        );
+        return false;
+      }
+
+      // Safely validate the request
+      let isValid = false;
+      try {
+        isValid = validateRequest(authToken, twilioSignature, url, params);
+      } catch (validationError) {
+        console.log(
+          "Twilio.ts: Error during Twilio validation:",
+          validationError
+        );
+        return false;
+      }
 
       if (!isValid) {
-        throw new Error(
-          "Invalid Twilio signature for request: \n" + twilioRequestBody
-        );
+        console.log("Twilio.ts: Invalid Twilio signature for request");
+        return false;
       }
 
       console.log("Twilio.ts: Twilio request validated");
-
-      return isValid;
+      return true;
     } catch (error) {
-      console.log("Twilio.ts: Failed to validate Twilio request: ", error);
+      // Catch any unexpected errors that might occur
+      console.log(
+        "Twilio.ts: Unexpected error during request validation:",
+        error
+      );
       return false;
-      // throw new Error(`Failed to validate Twilio request: ${error}`);
     }
   }
 }
