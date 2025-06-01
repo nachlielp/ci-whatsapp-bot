@@ -98,13 +98,9 @@ class Bot {
       };
     });
 
-    // return formattedMessages;
-
     const temp = formattedMessages.filter(
       (message) => message.phone === "972584994306"
     );
-
-    // return temp;
 
     const results = await Promise.allSettled(
       temp.map((message) => {

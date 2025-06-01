@@ -405,7 +405,6 @@ class Supabase {
       if (data.length === 0) {
         return [];
       }
-      console.log("data", data);
       return data as WAUser[];
     } catch (error) {
       console.error("Error getting WA users:", error);
