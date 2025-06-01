@@ -7,6 +7,8 @@ import {
   Region,
   districtOptions,
   SelectRegionListId,
+  SelectOption,
+  WAUser,
 } from "@/interface";
 import {
   emptyRegionMessage,
@@ -14,10 +16,12 @@ import {
   filterEventsByRegions,
   formatCIEventsList,
   formatSubscribedRegions,
+  northRegions,
   validateTwilioPayload,
 } from "@/util/utilService";
 import { twilio } from "./Twilio";
 import { supabase } from "./Supabase";
+import dayjs from "dayjs";
 
 class Bot {
   async handleTwilioWebhook(
@@ -46,6 +50,115 @@ class Bot {
     }
 
     await this.handleUpdateUserAndLogMessage(twilioResult, payload, startTime);
+  }
+
+  async handleWeeklyUpdate() {
+    const start = dayjs();
+    const ci_users = await supabase.getSubscribedUsers();
+    const ci_events = await supabase.getCIEvents(
+      dayjs().format("YYYY-MM-DD"),
+      dayjs().add(7, "day").format("YYYY-MM-DD")
+    );
+
+    // console.log("ci_events", ci_events);
+
+    const disctictEventsCount: Record<string, number> = {};
+
+    ci_events.forEach((event: { district: string }) => {
+      disctictEventsCount[event.district] =
+        (disctictEventsCount[event.district] || 0) + 1;
+    });
+
+    disctictEventsCount["north"] = Object.keys(disctictEventsCount)
+      .filter((key) => northRegions(key as Region))
+      .reduce((acc, key) => acc + disctictEventsCount[key], 0);
+
+    const formattedMessages: {
+      phone: string;
+      name: string;
+      filters: string;
+      eventsCount: number;
+    }[] = ci_users.map((user: WAUser) => {
+      const eventsCount = user.filter.reduce((acc, filter) => {
+        return acc + disctictEventsCount[filter];
+      }, 0);
+
+      return {
+        phone: user.phone,
+        name: user.name,
+        filters: user.filter
+          .map((filter: string) => {
+            const option = districtOptions.find(
+              (option: SelectOption) => option.value === filter
+            );
+            return option?.label;
+          })
+          .join(", "),
+        eventsCount,
+      };
+    });
+
+    // return formattedMessages;
+
+    const temp = formattedMessages.filter(
+      (message) => message.phone === "972584994306"
+    );
+
+    // return temp;
+
+    const results = await Promise.allSettled(
+      temp.map((message) => {
+        return twilio.sendTemplate(
+          `whatsapp:+${message.phone}`,
+          process.env.TWILIO_TEMPLATE_WEEKLY_SCHEDULE!,
+          {
+            "1": message.name,
+            "2": message.filters,
+            "3": message.eventsCount.toString(),
+          }
+        );
+      })
+    );
+
+    const formattedLogResults = results.map((result) => {
+      const user = ci_users.find(
+        (user: WAUser) =>
+          result.status === "fulfilled" && result.value.to.includes(user.phone)
+      );
+
+      if (!user) {
+        console.warn(
+          "Bot.handleWeeklyUpdate: User not found for log result",
+          result
+        );
+        return null;
+      }
+
+      return {
+        result,
+        wa_user_id: user?.id || "",
+        from: process.env.TWILIO_FROM_NUMBER!,
+        to: user?.phone,
+      };
+    });
+
+    await Promise.allSettled(
+      formattedLogResults
+        .filter((logResult) => logResult !== null)
+        .map((logResult) => {
+          return supabase.logTwilioResult(
+            logResult.result,
+            null,
+            logResult.wa_user_id,
+            logResult.from,
+            logResult.to,
+            "cron_job"
+          );
+        })
+    );
+
+    const end = dayjs();
+    console.log(`Time taken: ${end.diff(start, "seconds")} seconds`);
   }
 
   private async handleTextMessage(
@@ -361,7 +474,8 @@ class Bot {
         message.id,
         user.id,
         process.env.TWILIO_PHONE_NUMBER!,
-        user.phone
+        user.phone,
+        "user_message"
       );
     }
   }

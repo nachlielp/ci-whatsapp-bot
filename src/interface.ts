@@ -107,14 +107,15 @@ export interface WAMessage {
 }
 
 export interface WAUser {
-  name: string;
-  phone: string;
-  created_at: string;
   id: string;
+  created_at: string;
+  phone: string;
+  name: string;
+  is_subscribed: boolean;
   filter: Region[];
   message_count: number;
-  received_block_notice: boolean;
   is_blocked: boolean;
+  received_block_notice: boolean;
   updated_at: string;
 }
 

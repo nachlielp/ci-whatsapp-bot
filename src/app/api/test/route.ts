@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 // import { twilio } from "@/app/Twilio";
 // import { supabase } from "@/app/Supabase";
 // import { districtOptions } from "../interface";
+import { bot } from "@/app/Bot";
+
 import dotenv from "dotenv";
 dotenv.config();
 export async function GET() {
@@ -60,5 +62,7 @@ export async function GET() {
   //   );
   // }
   // throw new Error("test error blabla");
-  return NextResponse.json({});
+  const res = await bot.handleWeeklyUpdate();
+  console.log("res", res);
+  return NextResponse.json({ res });
 }

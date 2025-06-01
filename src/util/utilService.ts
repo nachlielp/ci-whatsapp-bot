@@ -193,3 +193,13 @@ export function validateTwilioPayload(payload: Record<string, string>) {
     return false;
   }
 }
+
+export function northRegions(region: Region) {
+  return (
+    region === Region.north ||
+    region === Region.galilee ||
+    region === Region.haifa ||
+    region === Region.carmel ||
+    region === Region.pardesHanna
+  );
+}

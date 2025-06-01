@@ -355,17 +355,18 @@ class Supabase {
 
   async logTwilioResult(
     twilioResult: object,
-    messageId: string,
+    messageId: string | null,
     userId: string,
     from: string,
-    to: string
+    to: string,
+    type: "user_message" | "cron_job"
   ) {
     try {
       const result = await this.supabase.from("wa_twilio_logs").insert({
         result: twilioResult,
         wa_users_id: userId,
         wa_messages_id: messageId,
-        trigger: "user_message",
+        trigger: type,
         from: from,
         to: to,
       });
@@ -386,6 +387,29 @@ class Supabase {
     } catch (e) {
       console.error("Error getting blocked users:", e);
       return [];
+    }
+  }
+
+  async getSubscribedUsers() {
+    try {
+      const { data, error } = await this.supabase
+        .from("wa_users")
+        .select("*")
+        .eq("is_subscribed", true);
+
+      if (error) {
+        console.error("Error getting WA users:", error);
+        throw error;
+      }
+
+      if (data.length === 0) {
+        return [];
+      }
+      console.log("data", data);
+      return data as WAUser[];
+    } catch (error) {
+      console.error("Error getting WA users:", error);
+      throw error;
     }
   }
 }
