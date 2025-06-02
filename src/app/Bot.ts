@@ -60,8 +60,6 @@ class Bot {
       dayjs().add(7, "day").format("YYYY-MM-DD")
     );
 
-    // console.log("ci_events", ci_events);
-
     const disctictEventsCount: Record<string, number> = {};
 
     ci_events.forEach((event: { district: string }) => {
@@ -98,12 +96,8 @@ class Bot {
       };
     });
 
-    const temp = formattedMessages.filter(
-      (message) => message.phone === "972584994306"
-    );
-
     const results = await Promise.allSettled(
-      temp.map((message) => {
+      formattedMessages.map((message) => {
         return twilio.sendTemplate(
           `whatsapp:+${message.phone}`,
           process.env.TWILIO_TEMPLATE_WEEKLY_SCHEDULE!,
@@ -154,7 +148,7 @@ class Bot {
     );
 
     const end = dayjs();
-    console.log(`Time taken: ${end.diff(start, "seconds")} seconds`);
+    console.log(`Time taken: ${end.diff(start, "milliseconds")} ms`);
   }
 
   private async handleTextMessage(
